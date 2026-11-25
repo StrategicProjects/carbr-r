@@ -70,6 +70,7 @@ car_tbl("PE") |>
 | [`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md) | Um imóvel pelo código |
 | [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md) | Verificação de uma lista de códigos de uma vez |
 | [`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md) | Imóveis que contêm um ponto |
+| [`car_typology()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md), [`car_typology_groups()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md) | Tipologia dos municípios em cinco grupos |
 | [`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md), [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md) | Indicadores de qualidade: sobreposição e área fora do município |
 | [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md) | Tabela preguiçosa para consultas com `dplyr` |
 | [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md) | Como citar os dados |
@@ -165,6 +166,14 @@ Sobreposição entre imóveis e área fora do município declarado.
 - [`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
   [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
   : Indicadores de qualidade do cadastro
+
+## Tipologia dos municípios
+
+Cinco grupos de municípios, pelo perfil do cadastro.
+
+- [`car_typology()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
+  [`car_typology_groups()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
+  : Tipologia dos municípios
 
 ## Citar
 

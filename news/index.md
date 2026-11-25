@@ -2,6 +2,11 @@
 
 ## carbr (development version)
 
+- [`car_typology()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
+  e
+  [`car_typology_groups()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md):
+  tipologia dos municípios em cinco grupos, pelo perfil do cadastro
+  (porte dos imóveis, etapa da análise e sobreposição).
 - [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md)
   passa a considerar a sobreposição com terras indígenas (Funai) e
   unidades de conservação (CNUC/MMA);

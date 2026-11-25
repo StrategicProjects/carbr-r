@@ -34,6 +34,14 @@ Sobreposição entre imóveis e área fora do município declarado.
   [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
   : Indicadores de qualidade do cadastro
 
+## Tipologia dos municípios
+
+Cinco grupos de municípios, pelo perfil do cadastro.
+
+- [`car_typology()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
+  [`car_typology_groups()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
+  : Tipologia dos municípios
+
 ## Citar
 
 - [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md)
