@@ -76,18 +76,25 @@ car_catalog_json <- function(refresh = FALSE, error_call = rlang::caller_env()) 
 }
 
 #' Path to a verified local copy of a small catalogue file
+#'
+#' The publication is updated in place. When a file no longer matches the
+#' SHA-256 of a catalogue read from the cache, the catalogue is read again
+#' and the file is checked against the fresh one.
 #' @returns The local path, or `NULL` when the file could not be fetched.
 #' @noRd
 car_cached_file <- function(cat, path, error_call = rlang::caller_env()) {
-  entry <- Filter(function(f) identical(f$path, path), cat$files)
-  if (length(entry) == 0) {
-    cli::cli_abort(
-      "{.path {path}} is not in the catalogue.",
-      class = "carbr_error_catalog",
-      call = error_call
-    )
+  sha_of <- function(cat) {
+    entry <- Filter(function(f) identical(f$path, path), cat$files)
+    if (length(entry) == 0) {
+      cli::cli_abort(
+        "{.path {path}} is not in the catalogue.",
+        class = "carbr_error_catalog",
+        call = error_call
+      )
+    }
+    entry[[1]]$sha256
   }
-  sha256 <- entry[[1]]$sha256
+  sha256 <- sha_of(cat)
   base <- car_base_url(error_call)
   if (!car_is_remote(base)) {
     return(file.path(base, path))
@@ -104,15 +111,22 @@ car_cached_file <- function(cat, path, error_call = rlang::caller_env()) {
   tmp <- paste0(dest, ".tmp")
   writeBin(raw, tmp)
   if (car_sha256(tmp) != sha256) {
-    unlink(tmp)
-    cli::cli_abort(
-      c(
-        "{.path {path}} does not match the SHA-256 in the catalogue.",
-        "i" = "The publication may be in progress; try again in a few minutes."
-      ),
-      class = "carbr_error_integrity",
-      call = error_call
-    )
+    fresh <- car_catalog_json(refresh = TRUE, error_call = error_call)
+    if (!is.null(fresh) && car_sha256(tmp) == sha_of(fresh)) {
+      cat <- fresh
+      dest <- file.path(car_cache_dir(), cat$version, path)
+      dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
+    } else {
+      unlink(tmp)
+      cli::cli_abort(
+        c(
+          "{.path {path}} does not match the SHA-256 in the catalogue.",
+          "i" = "The publication may be in progress; try again in a few minutes."
+        ),
+        class = "carbr_error_integrity",
+        call = error_call
+      )
+    }
   }
   file.rename(tmp, dest)
   # Files of other catalogue versions are superseded.

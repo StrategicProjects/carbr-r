@@ -103,3 +103,41 @@ test_that("a missing publication warns and returns the empty schema", {
   expect_true("property_code" %in% names(out))
   expect_warning(expect_equal(nrow(car_catalog()), 0), class = "carbr_error_http")
 })
+
+test_that("a file updated in place is accepted after re-reading the catalogue", {
+  skip_if_not_installed("sf")
+  dir <- release_teste()
+  cache <- withr::local_tempdir()
+  withr::local_options(
+    carbr.base_url = "https://car.test/current", carbr.cache_dir = cache, carbr.max_tries = 1
+  )
+  served <- 0
+  httr2::local_mocked_responses(function(req) {
+    file <- file.path(dir, utils::URLdecode(sub("^https://car.test/current/", "", req$url)))
+    served <<- served + 1
+    httr2::response(status_code = 200, body = readBin(file, "raw", file.size(file)))
+  })
+  expect_equal(car_municipalities("PE")$properties, c(4L, 2L))
+
+  # The publication changes: new summary file, new catalogue. The cached
+  # catalogue still lists the old SHA-256.
+  f_mun <- file.path(dir, "municipalities", "state=PE.parquet")
+  con <- DBI::dbConnect(duckdb::duckdb())
+  DBI::dbExecute(con, sprintf(
+    "COPY (SELECT * REPLACE (properties + 1 AS properties) FROM read_parquet('%s'))
+     TO '%s.new' (FORMAT parquet)", f_mun, f_mun
+  ))
+  DBI::dbDisconnect(con, shutdown = TRUE)
+  file.rename(paste0(f_mun, ".new"), f_mun)
+  cat <- jsonlite::fromJSON(file.path(dir, "catalog.json"), simplifyVector = FALSE)
+  cat$files[[2]]$sha256 <- paste(unclass(openssl::sha256(file(f_mun))), collapse = "")
+  jsonlite::write_json(cat, file.path(dir, "catalog.json"), auto_unbox = TRUE)
+  unlink(file.path(cache, "2026-01-01"), recursive = TRUE)
+
+  expect_equal(car_municipalities("PE")$properties, c(5L, 3L))
+
+  # A file that matches no catalogue is still refused.
+  writeBin(as.raw(1:10), f_mun)
+  unlink(file.path(cache, "2026-01-01"), recursive = TRUE)
+  expect_error(car_municipalities("PE"), class = "carbr_error_integrity")
+})

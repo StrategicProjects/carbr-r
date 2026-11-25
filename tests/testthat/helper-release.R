@@ -7,6 +7,8 @@ square_wkb <- function(x, y, side = 0.01) {
 }
 
 release_teste <- function(env = parent.frame()) {
+  testthat::skip_if_not_installed("blob")
+  testthat::skip_if_not_installed("sf")
   dir <- withr::local_tempdir(.local_envir = env)
   x <- c(-40.50, -40.48, -40.46, -35.00, -34.98, -40.50)
   y <- c(-9.40, -9.40, -9.40, -8.00, -8.00, -9.40)
