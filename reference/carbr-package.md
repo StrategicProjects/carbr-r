@@ -2,13 +2,14 @@
 
 A tidy interface to the rural properties declared in the Rural
 Environmental Registry of Brazil ('Cadastro Ambiental Rural', 'CAR'),
-republished from the public service of the national system ('Sicar') as
-cloud-optimised 'GeoParquet'. Queries by state, municipality, status,
-size, bounding box, point or property code read only the parts of the
-remote files they need, so no full download of the registry is required.
-Results are returned as tibbles or 'sf' objects. Small files are cached
-on disk per catalogue version and checked against their published
-'SHA-256'. Network failures are handled gracefully.
+republished from the public service of the national system ('Sicar',
+<https://www.car.gov.br/>) as cloud-optimised 'GeoParquet'. Queries by
+state, municipality, status, size, bounding box, point or property code
+read only the parts of the remote files they need, so no full download
+of the registry is required, and precomputed summaries answer national
+counts in seconds. Results are returned as tibbles or 'sf' objects.
+Small files are cached on disk per catalogue version and checked against
+their published 'SHA-256'. Network failures are handled gracefully.
 
 ## Opções do pacote
 
