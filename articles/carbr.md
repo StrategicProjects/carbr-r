@@ -277,69 +277,122 @@ car_municipalities() |>
 
 ## Imóveis de um município
 
-Os filtros de
 [`car_properties()`](https://strategicprojects.github.io/carbr-r/reference/car_properties.md)
-são aplicados antes da leitura. Aqui, os imóveis médios e grandes de
-Petrolina, em Pernambuco — algumas centenas, de um arquivo com mais de
-400 mil. Com o pacote `sf` instalado, o resultado é um objeto `sf` em
-SIRGAS 2000.
+traz os imóveis de uma UF, com filtros aplicados antes da leitura: só os
+trechos do arquivo que atendem ao filtro são transferidos. Aqui, todos
+os imóveis de Petrolina, em Pernambuco — cerca de 11 mil, de um arquivo
+estadual com mais de 400 mil. Com o pacote `sf` instalado, o resultado é
+um objeto `sf` em SIRGAS 2000.
 
 ``` r
 
-petrolina <- car_properties(
-  "PE",
-  municipality = "Petrolina",
-  size_class = c("medium", "large")
-)
+petrolina <- car_properties("PE", municipality = "Petrolina")
 petrolina |> select(property_code, status, area_ha, fiscal_modules, size_class)
-#> Simple feature collection with 119 features and 5 fields
+#> Simple feature collection with 10918 features and 5 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
-#> Bounding box:  xmin: -40.96095 ymin: -9.465393 xmax: -40.26997 ymax: -8.629952
+#> Bounding box:  xmin: -40.96095 ymin: -9.480338 xmax: -40.2083 ymax: -8.623582
 #> Geodetic CRS:  SIRGAS 2000
-#> # A tibble: 119 × 6
+#> # A tibble: 10,918 × 6
 #>   property_code                               status area_ha fiscal_modules
 #>   <chr>                                       <chr>    <dbl>          <dbl>
-#> 1 PE-2611101-111805B2DFBA4AF7B2BE2458D8CE27FD active    652.          11.6 
-#> 2 PE-2611101-B095898582B2428EBDD3200C7CA25992 active    245.           4.46
-#> 3 PE-2611101-69A386072C4E4D3189F24800452142C1 active    246.           4.47
-#> 4 PE-2611101-C283CE3BF96A440DBE8D9026B91FC2C1 active    535.           9.73
-#> 5 PE-2611101-ADEC18D9D8EA4CB6B5A3F56074EA0B63 active    432.           7.86
-#> 6 PE-2611101-03F43B55FBE64453A6F2F740902D02CB active    804.          14.6 
+#> 1 PE-2611101-0D7CB5B3271D4C10BB99569D4857BA39 active   52.9          0.962 
+#> 2 PE-2611101-111805B2DFBA4AF7B2BE2458D8CE27FD active  652.          11.6   
+#> 3 PE-2611101-4E7C9A07F92E4181A8CD600ECAE54DDF active    2.85         0.0518
+#> 4 PE-2611101-328696C6E5DD436D9AAB872A359C600A active   40.9          0.738 
+#> 5 PE-2611101-D0361CB6B3964A1781A0D7E4C507D83C active    2.51         0.0456
+#> 6 PE-2611101-F180E6F04B0B4F39A28C791C4F1BECE8 active    9.65         0.176 
 #>   size_class                                                            geometry
 #>   <chr>                                                       <MULTIPOLYGON [°]>
-#> 1 medium     (((-40.75303 -9.397993, -40.75799 -9.422049, -40.73045 -9.4222, -4…
-#> 2 medium     (((-40.61826 -9.430964, -40.61285 -9.428212, -40.59929 -9.464471, …
-#> 3 medium     (((-40.60167 -9.465393, -40.59937 -9.464515, -40.60074 -9.461139, …
-#> 4 medium     (((-40.59909 -9.395273, -40.59908 -9.395334, -40.59844 -9.395319, …
-#> 5 medium     (((-40.67597 -9.459559, -40.64619 -9.406101, -40.65469 -9.401102, …
-#> 6 medium     (((-40.68179 -9.449823, -40.67185 -9.431734, -40.65942 -9.409054, …
-#> # ℹ 113 more rows
+#> 1 small      (((-40.75791 -9.422134, -40.75838 -9.422132, -40.75881 -9.422129, …
+#> 2 medium     (((-40.75303 -9.397993, -40.75799 -9.422049, -40.73045 -9.4222, -4…
+#> 3 small      (((-40.75751 -9.434869, -40.76116 -9.42215, -40.76103 -9.422122, -…
+#> 4 small      (((-40.76185 -9.422066, -40.76021 -9.422124, -40.75976 -9.422127, …
+#> 5 small      (((-40.7527 -9.436908, -40.75283 -9.436965, -40.75362 -9.434765, -…
+#> 6 small      (((-40.75283 -9.436965, -40.75362 -9.434765, -40.75369 -9.43459, -…
+#> # ℹ 10,912 more rows
 ```
+
+Sobre uma imagem de satélite, o cadastro mostra a ocupação do município:
+os lotes estreitos dos perímetros irrigados junto ao rio São Francisco,
+ao sul e a leste, e os imóveis maiores da caatinga, ao norte. O fundo
+vem do pacote `maptiles` e é desenhado com o `tidyterra`.
 
 ``` r
 
-ggplot(petrolina) +
-  geom_sf(aes(fill = size_class), colour = "white", linewidth = 0.1, alpha = 0.8) +
+valid <- petrolina |>
+  filter(geometry_valid, status != "cancelled") |>
+  mutate(size_class = factor(size_class, c("small", "medium", "large"))) |>
+  arrange(desc(area_ha))
+
+imagery <- maptiles::get_tiles(valid, provider = "Esri.WorldImagery", zoom = 10, crop = TRUE)
+
+ggplot() +
+  tidyterra::geom_spatraster_rgb(data = imagery, maxcell = 2e6) +
+  geom_sf(
+    data = valid, aes(fill = size_class, colour = size_class),
+    linewidth = 0.15, alpha = 0.55
+  ) +
   scale_fill_manual(
-    values = c(medium = "#8fbf9f", large = "#1f5f3a"),
-    breaks = c("medium", "large"),
-    labels = c(medium = "Médio (4 a 15 módulos fiscais)", large = "Grande (acima de 15)"),
-    name = NULL
+    values = c(small = "#ffe066", medium = "#ff922b", large = "#e03131"),
+    labels = c("Pequeno (até 4 módulos fiscais)", "Médio (4 a 15)", "Grande (acima de 15)"),
+    name = NULL, aesthetics = c("fill", "colour")
   ) +
+  coord_sf(expand = FALSE) +
   labs(
-    title = "Imóveis médios e grandes no CAR",
-    subtitle = "Petrolina, Pernambuco",
-    caption = "Fonte: SFB/Sicar, via carbr. Cadastro autodeclarado, com sobreposições."
+    title = "Imóveis declarados no CAR em Petrolina, Pernambuco",
+    subtitle = paste(nrow(valid), "cadastros ativos ou pendentes, por porte"),
+    caption = "Fonte: SFB/Sicar, via carbr. Imagem: Esri World Imagery (Esri e colaboradores)."
   ) +
-  theme_minimal() +
-  theme(legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_void() +
+  theme(
+    legend.position = "bottom", plot.title = element_text(face = "bold"),
+    plot.margin = margin(6, 6, 6, 6)
+  )
 ```
 
-![Mapa dos imóveis médios e grandes declarados no CAR em
-Petrolina.](carbr-petrolina-1.png)
+![Mapa dos imóveis declarados no CAR em Petrolina sobre imagem de
+satélite, coloridos por porte.](carbr-petrolina-1.png)
 
 plot of chunk petrolina
+
+Os filtros combinam. Só os imóveis grandes com cadastro ativo:
+
+``` r
+
+car_properties(
+  "PE",
+  municipality = "Petrolina", size_class = "large", status = "active",
+  geometry = FALSE
+) |>
+  arrange(desc(area_ha)) |>
+  select(property_code, area_ha, fiscal_modules, condition)
+#> # A tibble: 10 × 4
+#>    property_code                               area_ha fiscal_modules
+#>    <chr>                                         <dbl>          <dbl>
+#>  1 PE-2611101-1D0D47540B264F2183AE47FFF23F1354   1820.           33.1
+#>  2 PE-2611101-F9DE04E8745149E5B3557922FB5DD40D   1595.           29.0
+#>  3 PE-2611101-E4D25AC2FB254BD0B3A29678D08F9C0E   1281.           23.3
+#>  4 PE-2611101-C52BB95C85E24595B8392A28CB190C13   1037.           18.9
+#>  5 PE-2611101-9FB673F34F904B3B951BD4DD2E7AFB18   1026.           18.6
+#>  6 PE-2611101-F2B10E8F0D7749A89200B1B538FBAE86   1024.           18.6
+#>  7 PE-2611101-6BEF7820114C4BE99B3974A937409469    996.           18.1
+#>  8 PE-2611101-A0DF298BDC7C48ACB976417AA75C9050    995.           18.1
+#>  9 PE-2611101-A94CA3B342CF444CBCB9C558E9A7CAFC    844.           15.3
+#> 10 PE-2611101-1608C1C7C3374712B7934B207CE25D46    827.           15.0
+#>    condition         
+#>    <chr>             
+#>  1 Aguardando análise
+#>  2 Aguardando análise
+#>  3 Aguardando análise
+#>  4 Aguardando análise
+#>  5 Aguardando análise
+#>  6 Aguardando análise
+#>  7 Aguardando análise
+#>  8 Aguardando análise
+#>  9 Aguardando análise
+#> 10 Aguardando análise
+```
 
 O município pode ser dado pelo nome (sem diferenciar maiúsculas nem
 acentos) ou pelo código IBGE de sete dígitos. Os outros filtros são
