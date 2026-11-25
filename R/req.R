@@ -3,7 +3,7 @@
 #' A URL or a local folder holding the published tree. The default is the
 #' public bucket; an S3-compatible mirror or a local copy can replace it.
 #' @noRd
-car_default_url <- "https://pub-9fa571ccff7d4c61a60e0b25b754ff6d.r2.dev/current"
+car_default_url <- "https://car.castlab.org/current"
 
 #' @noRd
 car_base_url <- function(error_call = rlang::caller_env()) {
