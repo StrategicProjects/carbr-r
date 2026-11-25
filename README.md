@@ -1,6 +1,6 @@
-# carbr <a href="https://strategicprojects.github.io/carbr-r/"><img src="man/figures/logo.svg" align="right" height="139" alt="carbr website" /></a>
+# carbr <a href="https://castlaboratory.github.io/carbr-r/"><img src="man/figures/logo.svg" align="right" height="139" alt="carbr website" /></a>
 
-[![R-CMD-check](https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Os imóveis rurais declarados no **Cadastro Ambiental Rural (CAR)** no R, sem
@@ -15,7 +15,7 @@ servidores do Sicar.
 
 ```r
 # install.packages("pak")
-pak::pak("StrategicProjects/carbr-r")
+pak::pak("castlaboratory/carbr-r")
 ```
 
 Para ler só os trechos necessários dos arquivos remotos, o `carbr` usa o DuckDB com a
@@ -64,9 +64,9 @@ car_tbl("PE") |>
 
 ## Guias
 
-- [Primeiros passos](https://strategicprojects.github.io/carbr-r/articles/carbr.html)
-- [Inconsistências do cadastro](https://strategicprojects.github.io/carbr-r/articles/inconsistencias.html): sobreposições, imóveis fora do município, área declarada maior que o território.
-- [Onde a análise está parada](https://strategicprojects.github.io/carbr-r/articles/analise.html): as etapas da análise por UF e quem aguarda resposta à notificação.
+- [Primeiros passos](https://castlaboratory.github.io/carbr-r/articles/carbr.html)
+- [Inconsistências do cadastro](https://castlaboratory.github.io/carbr-r/articles/inconsistencias.html): sobreposições, imóveis fora do município, área declarada maior que o território.
+- [Onde a análise está parada](https://castlaboratory.github.io/carbr-r/articles/analise.html): as etapas da análise por UF e quem aguarda resposta à notificação.
 
 ## Os dados
 
@@ -90,7 +90,7 @@ car_tbl("PE") |>
 - **Endereço:** o padrão é um bucket público; `options(carbr.base_url = )` ou a variável
   `CAR_URL` apontam para um espelho compatível com S3 ou para uma pasta local.
 
-As mesmas funções existem em Python: [carbr-py](https://github.com/StrategicProjects/carbr-py).
+As mesmas funções existem em Python: [carbr-py](https://github.com/castlaboratory/carbr-py).
 
 ## Licença
 

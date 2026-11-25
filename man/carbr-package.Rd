@@ -33,9 +33,9 @@ exponencial) e tempo limite de cada requisição em segundos (padrão 60).
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/StrategicProjects/carbr-r}
-  \item \url{https://strategicprojects.github.io/carbr-r/}
-  \item Report bugs at \url{https://github.com/StrategicProjects/carbr-r/issues}
+  \item \url{https://github.com/castlaboratory/carbr-r}
+  \item \url{https://castlaboratory.github.io/carbr-r/}
+  \item Report bugs at \url{https://github.com/castlaboratory/carbr-r/issues}
 }
 
 }
