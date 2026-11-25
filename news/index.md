@@ -1,5 +1,12 @@
 # Changelog
 
+## carbr (development version)
+
+- [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md):
+  verifica uma lista de códigos de imóvel de uma vez e resume o que
+  consta de cada um (`ok`, `attention`, `blocked`, `not_found`,
+  `invalid`).
+
 ## carbr 0.1.0
 
 - Primeira versão:

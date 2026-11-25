@@ -19,6 +19,8 @@ O que está publicado e o que cada coluna significa.
   : Imóveis rurais declarados no CAR
 - [`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md)
   : Um imóvel pelo código
+- [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md)
+  : Verificar vários imóveis de uma vez
 - [`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md)
   : Imóveis que contêm um ponto
 - [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md)

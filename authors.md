@@ -27,13 +27,13 @@ Source:
 
 Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D, Nascimento
 Barreto J, Nunes Braz de Oliveira H (2026). *carbr: Access the Rural
-Environmental Registry of Brazil ('CAR')*. R package version 0.1.0,
+Environmental Registry of Brazil ('CAR')*. R package version 0.1.0.9000,
 <https://github.com/castlaboratory/carbr-r>.
 
     @Manual{,
       title = {carbr: Access the Rural Environmental Registry of Brazil ('CAR')},
       author = {André Leite and Marcos Wasiliew and Hugo Vasconcelos and Carlos Amorim and Diogo Bezerra and Júlia {Nascimento Barreto} and Hortênsia {Nunes Braz de Oliveira}},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 0.1.0.9000},
       url = {https://github.com/castlaboratory/carbr-r},
     }

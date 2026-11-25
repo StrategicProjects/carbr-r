@@ -52,6 +52,7 @@ car_properties("PE", status = "pending", geometry = FALSE)
 
 car_at(lon = -40.5, lat = -9.2)     # que imóveis estão declarados neste ponto?
 car_property("PE-2611101-588BC484570D440484F527F07DF5AFFA")
+car_check(codigos)                  # triagem de uma lista de códigos
 
 # Qualquer outra consulta, com dplyr, direto no arquivo remoto
 car_tbl("PE") |>
@@ -67,6 +68,7 @@ car_tbl("PE") |>
 | [`car_municipalities()`](https://castlaboratory.github.io/carbr-r/reference/car_municipalities.md) | Resumo por município |
 | [`car_properties()`](https://castlaboratory.github.io/carbr-r/reference/car_properties.md) | Imóveis de uma UF, com filtros aplicados antes da leitura |
 | [`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md) | Um imóvel pelo código |
+| [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md) | Verificação de uma lista de códigos de uma vez |
 | [`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md) | Imóveis que contêm um ponto |
 | [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md) | Tabela preguiçosa para consultas com `dplyr` |
 | [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md) | Como citar os dados |
@@ -148,6 +150,8 @@ O que está publicado e o que cada coluna significa.
   : Imóveis rurais declarados no CAR
 - [`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md)
   : Um imóvel pelo código
+- [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md)
+  : Verificar vários imóveis de uma vez
 - [`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md)
   : Imóveis que contêm um ponto
 - [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md)
