@@ -148,7 +148,7 @@ car_data_sql <- function(cat, prefix, state, error_call = rlang::caller_env()) {
     files <- file.path(base, keep)
   }
   quoted <- as.character(DBI::dbQuoteString(car_con(), files))
-  paste0("read_parquet([", paste(quoted, collapse = ", "), "])")
+  paste0("read_parquet([", paste(quoted, collapse = ", "), "], union_by_name = true)")
 }
 
 #' Run a query, turning a failed remote read into a warning and `NULL`

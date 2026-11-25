@@ -1,5 +1,7 @@
 # carbr (development version)
 
+* `car_check()` passa a considerar a sobreposição com terras indígenas (Funai) e unidades de
+  conservação (CNUC/MMA); `car_quality()` e `car_quality_summary()` trazem as parcelas e os nomes.
 * `car_quality()` e `car_quality_summary()`: indicadores de qualidade do cadastro, por imóvel e por
   município (sobreposição com outros imóveis e área fora do município declarado).
 * `car_check()`: verifica uma lista de códigos de imóvel de uma vez e resume o que consta

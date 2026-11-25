@@ -71,7 +71,14 @@ release_teste <- function(env = parent.frame()) {
     municipality_code = c(2611101L, 2611101L, 2611101L, 2611101L, 2611606L),
     overlap_count = c(1L, 0L, 0L, 1L, 0L),
     overlap_share = c(1, 0, 0, 0.04, 0),
-    outside_share = c(0, 0, 0.6, 0, 0)
+    outside_share = c(0, 0, 0.6, 0, 0),
+    # Property 2 sits on an indigenous land; 3, partly in a park; 6, wholly in an APA.
+    indigenous_share = c(0, 0.8, 0, 0, 0),
+    strict_protection_share = c(0, 0, 0.3, 0, 0),
+    sustainable_use_share = c(0, 0, 0, 1, 0),
+    indigenous_land = c(NA, "Terra Teste", NA, NA, NA),
+    conservation_unit = c(NA, NA, "Parque Teste", "APA Teste", NA),
+    conservation_category = c(NA, NA, "Parque", "APA", NA)
   )
   duckdb::duckdb_register(con, "quality", quality)
   dir.create(file.path(dir, "quality"))
@@ -87,7 +94,13 @@ release_teste <- function(env = parent.frame()) {
             count(*) FILTER (overlap_share > 0.5) AS overlapping_half,
             sum(p.area_ha * overlap_share) AS overlap_ha,
             count(*) FILTER (outside_share > 0.5) AS outside_half,
-            sum(p.area_ha * outside_share) AS outside_ha
+            sum(p.area_ha * outside_share) AS outside_ha,
+            count(*) FILTER (indigenous_share > 0.01) AS indigenous,
+            sum(p.area_ha * indigenous_share) AS indigenous_ha,
+            count(*) FILTER (strict_protection_share > 0.01) AS strict_protection,
+            sum(p.area_ha * strict_protection_share) AS strict_protection_ha,
+            count(*) FILTER (sustainable_use_share > 0.01) AS sustainable_use,
+            sum(p.area_ha * sustainable_use_share) AS sustainable_use_ha
           FROM quality q JOIN props p USING (property_code) GROUP BY ALL) TO '%s' (FORMAT parquet)", f_qm
   ))
   sha <- function(f) paste(unclass(openssl::sha256(file(f))), collapse = "")

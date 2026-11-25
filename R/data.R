@@ -432,23 +432,30 @@ car_stage <- function(condition) {
 #' oficial:
 #'
 #' * `"ok"`: cadastro ativo, sem notificação pendente;
-#' * `"attention"`: cadastro pendente, ou analisado com notificação ainda
-#'   sem resposta do declarante;
+#' * `"attention"`: cadastro pendente, analisado com notificação ainda sem
+#'   resposta do declarante, ou com mais de 1% da área sobre terra indígena
+#'   ou unidade de conservação de proteção integral;
 #' * `"blocked"`: cadastro cancelado ou suspenso;
 #' * `"not_found"`: código que não está na publicação (pode ter sido
 #'   cadastrado depois da última atualização);
 #' * `"invalid"`: texto que não tem o formato de um código do CAR.
 #'
-#' A verificação diz só o que a camada pública traz. Não cobre embargos,
-#' sobreposição com terras indígenas ou unidades de conservação, nem
-#' substitui a consulta oficial ao Sicar.
+#' A sobreposição com terras indígenas (Funai) e unidades de conservação
+#' (CNUC/MMA) é calculada na publicação, pelos perímetros declarados. Estar
+#' em unidade de uso sustentável é informado na nota, mas não muda o
+#' resultado: áreas de proteção ambiental e reservas particulares admitem
+#' imóveis privados. A verificação não cobre embargos nem outras áreas
+#' públicas, e não substitui a consulta oficial ao Sicar.
 #'
 #' @param code Códigos de imóvel no CAR (`UF-0000000-identificador`).
 #' @returns Um tibble com uma linha por código, na ordem dada: `property_code`,
 #'   `check`, `note` (o motivo, em português), `stage` (a etapa da análise:
 #'   `"waiting"`, `"analysing"`, `"notified"`, `"answered"`, `"done"` ou
 #'   `"cancelled"`), `status`, `condition`, `property_type`, `size_class`,
-#'   `area_ha`, `fiscal_modules`, `state`, `municipality` e `created_at`.
+#'   `area_ha`, `fiscal_modules`, `state`, `municipality`, `created_at` e,
+#'   para os imóveis não cancelados, `indigenous_share`,
+#'   `strict_protection_share`, `sustainable_use_share` (parcelas da área, de
+#'   0 a 1) e `protected_area` (os nomes das áreas sobrepostas).
 #' @examplesIf interactive()
 #' car_check(c(
 #'   "PE-2611101-588BC484570D440484F527F07DF5AFFA",
@@ -464,6 +471,7 @@ car_check <- function(code) {
     "area_ha", "fiscal_modules", "state", "municipality", "created_at"
   )
   found <- car_empty_properties()[columns]
+  towns_found <- integer()
   cat <- car_catalog_json()
   if (!is.null(cat) && any(valid)) {
     for (uf in intersect(unique(substr(code[valid], 1, 2)), names(cat$states))) {
@@ -481,10 +489,14 @@ car_check <- function(code) {
         more <- car_collect(dplyr::filter(tbl, .data$property_code %in% !!left))
         if (!is.null(more)) part <- rbind(part, more)
       }
-      if (!is.null(part)) found <- rbind(found, tibble::as_tibble(part)[columns])
+      if (!is.null(part)) {
+        found <- rbind(found, tibble::as_tibble(part)[columns])
+        towns_found <- c(towns_found, stats::setNames(part$municipality_code, part$property_code))
+      }
     }
   }
   out <- dplyr::left_join(tibble::tibble(property_code = code), found, by = "property_code")
+  out <- dplyr::left_join(out, car_check_quality(towns_found), by = "property_code")
   missing <- is.na(out$state)
   out$stage <- car_stage(out$condition)
   out$check <- dplyr::case_when(
@@ -505,48 +517,128 @@ car_check <- function(code) {
     is.na(out$status) ~ "Situa\u00e7\u00e3o n\u00e3o reconhecida.",
     TRUE ~ "Cadastro ativo, sem notifica\u00e7\u00e3o pendente."
   )
-  out[c("property_code", "check", "note", "stage", setdiff(columns, "property_code"))]
+  # Indigenous lands and conservation units: under 1% of the area is boundary noise.
+  share <- function(x) ifelse(is.na(x), 0, x)
+  ti <- share(out$indigenous_share) >= 0.01
+  strict <- share(out$strict_protection_share) >= 0.01
+  sustainable <- !strict & share(out$sustainable_use_share) >= 0.01
+  extra <- paste0(
+    ifelse(ti, paste0(
+      " Sobrep\u00f5e terra ind\u00edgena (", out$indigenous_land, ") em ", car_percent(out$indigenous_share), "."
+    ), ""),
+    ifelse(strict, paste0(
+      " Sobrep\u00f5e unidade de conserva\u00e7\u00e3o de prote\u00e7\u00e3o integral (", out$conservation_unit, ") em ",
+      car_percent(out$strict_protection_share), "."
+    ), ""),
+    ifelse(sustainable & out$check != "blocked", paste0(
+      " Fica em unidade de conserva\u00e7\u00e3o de uso sustent\u00e1vel (", out$conservation_category, ": ",
+      out$conservation_unit, "), em ", car_percent(out$sustainable_use_share), "."
+    ), "")
+  )
+  alert <- (ti | strict) & out$check == "ok"
+  out$note <- trimws(paste0(ifelse(alert, "", out$note), extra))
+  out$check[alert] <- "attention"
+  out$protected_area <- mapply(function(a, b, c, d) {
+    names <- c(if (a) b, if (c) d)
+    if (length(names) == 0) NA_character_ else paste(names, collapse = "; ")
+  }, ti, out$indigenous_land, strict | sustainable, out$conservation_unit, USE.NAMES = FALSE)
+  out[c(
+    "property_code", "check", "note", "stage", setdiff(columns, "property_code"),
+    "indigenous_share", "strict_protection_share", "sustainable_use_share", "protected_area"
+  )]
+}
+
+#' "toda a area" or "NN% da area"
+#' @noRd
+car_percent <- function(share) {
+  ifelse(!is.na(share) & share >= 0.995, "toda a \u00e1rea", paste0(pmax(1, round(100 * share)), "% da \u00e1rea"))
+}
+
+#' Overlap with protected areas for the properties found by [car_check()]
+#' @param towns Municipality codes named by property code.
+#' @noRd
+car_check_quality <- function(towns) {
+  columns <- c(
+    "property_code", "indigenous_share", "strict_protection_share", "sustainable_use_share",
+    "indigenous_land", "conservation_unit", "conservation_category"
+  )
+  out <- car_empty_quality()[columns]
+  for (uf in unique(substr(names(towns), 1, 2))) {
+    here <- towns[substr(names(towns), 1, 2) == uf]
+    part <- suppressWarnings(car_quality(uf, municipality = unique(unname(here))))
+    out <- rbind(out, part[part$property_code %in% names(here), columns])
+  }
+  out
+}
+
+#' Zero-row tibble with the columns of [car_quality()]
+#' @noRd
+car_empty_quality <- function() {
+  tibble::tibble(
+    property_code = character(), municipality_code = integer(),
+    overlap_count = integer(), overlap_share = double(), outside_share = double(),
+    indigenous_share = double(), strict_protection_share = double(), sustainable_use_share = double(),
+    indigenous_land = character(), conservation_unit = character(), conservation_category = character()
+  )
+}
+
+#' Add the columns of `empty` that `out` lacks (as `NA`) and put them in order
+#' @noRd
+car_like <- function(out, empty) {
+  for (name in setdiff(names(empty), names(out))) out[[name]] <- rep(empty[[name]][NA_integer_], nrow(out))
+  tibble::as_tibble(out)[names(empty)]
 }
 
 #' Indicadores de qualidade do cadastro
 #'
-#' Dois sinais de inconsistência, calculados na publicação para cada imóvel
-#' não cancelado:
+#' Sinais calculados na publicação para cada imóvel não cancelado:
 #'
 #' * `overlap_count` e `overlap_share`: com quantos outros imóveis do estado
 #'   ele divide área, e que parcela da área dele está sobreposta (a soma das
 #'   interseções com cada vizinho, limitada a 1);
 #' * `outside_share`: que parcela da área fica fora do município declarado,
-#'   pela malha municipal do IBGE.
+#'   pela malha municipal do IBGE;
+#' * `indigenous_share`: que parcela fica dentro de terras indígenas (Funai,
+#'   todas as fases do processo), com o nome da principal em
+#'   `indigenous_land`;
+#' * `strict_protection_share` e `sustainable_use_share`: que parcela fica
+#'   dentro de unidades de conservação de proteção integral e de uso
+#'   sustentável (CNUC/MMA), com o nome e a categoria da principal em
+#'   `conservation_unit` e `conservation_category` (a de proteção integral,
+#'   se houver).
 #'
 #' `car_quality()` traz os indicadores por imóvel; `car_quality_summary()`,
 #' o resumo por município: imóveis não cancelados (`properties`), quantos
 #' têm sobreposição acima de 1% (`overlapping`) e de 50% da área
 #' (`overlapping_half`), os hectares sobrepostos (`overlap_ha`, somando os
 #' dois lados de cada par), e quantos imóveis (`outside_half`) e hectares
-#' (`outside_ha`) ficam fora do município declarado.
+#' (`outside_ha`) ficam fora do município declarado; e, para terras
+#' indígenas (`indigenous`), unidades de proteção integral
+#' (`strict_protection`) e de uso sustentável (`sustainable_use`), quantos
+#' imóveis têm mais de 1% da área dentro delas e quantos hectares (`*_ha`).
 #'
-#' Sobreposição não é sinônimo de disputa: inclui imóvel declarado duas
-#' vezes e lote dentro de assentamento. A comparação é só entre imóveis do
-#' mesmo estado.
+#' Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
+#' declarado duas vezes e lote dentro de assentamento; a comparação é só
+#' entre imóveis do mesmo estado. Estar em unidade de uso sustentável também
+#' não é irregularidade: áreas de proteção ambiental (APA) e reservas
+#' particulares (RPPN) admitem imóveis privados. As edições das camadas
+#' estão em `source$protected_areas` no catálogo.
 #'
 #' @param state Sigla de uma ou mais UFs. Em `car_quality_summary()`, `NULL`
 #'   (padrão) traz todas as publicadas.
 #' @param municipality Nomes ou códigos IBGE (7 dígitos) de municípios; lê
 #'   só os trechos deles.
-#' @returns Um tibble. `car_quality()`: `property_code`, `municipality_code`,
-#'   `overlap_count`, `overlap_share` e `outside_share`; junte a
-#'   [car_properties()] por `property_code`. Zero linhas (com aviso) se a
-#'   publicação não responder ou não trouxer os indicadores.
+#' @returns Um tibble. `car_quality()`: `property_code`, `municipality_code`
+#'   e os indicadores acima; junte a [car_properties()] por `property_code`.
+#'   Zero linhas (com aviso) se a publicação não responder ou não trouxer os
+#'   indicadores; as colunas de terras indígenas e unidades de conservação
+#'   vêm vazias se a publicação ainda não as traz.
 #' @examplesIf interactive()
 #' car_quality("PE", municipality = "Petrolina")
 #' car_quality_summary("PE")
 #' @export
 car_quality <- function(state, municipality = NULL) {
-  empty <- tibble::tibble(
-    property_code = character(), municipality_code = integer(),
-    overlap_count = integer(), overlap_share = double(), outside_share = double()
-  )
+  empty <- car_empty_quality()
   cat <- car_catalog_json()
   if (is.null(cat)) {
     return(empty)
@@ -573,7 +665,7 @@ car_quality <- function(state, municipality = NULL) {
   if (is.null(out)) {
     return(empty)
   }
-  tibble::as_tibble(out)[names(empty)]
+  car_like(out, empty)
 }
 
 #' @rdname car_quality
@@ -582,7 +674,10 @@ car_quality_summary <- function(state = NULL) {
   empty <- tibble::tibble(
     state = character(), municipality_code = integer(), municipality = character(),
     properties = integer(), overlapping = integer(), overlapping_half = integer(),
-    overlap_ha = double(), outside_half = integer(), outside_ha = double()
+    overlap_ha = double(), outside_half = integer(), outside_ha = double(),
+    indigenous = integer(), indigenous_ha = double(),
+    strict_protection = integer(), strict_protection_ha = double(),
+    sustainable_use = integer(), sustainable_use_ha = double()
   )
   cat <- car_catalog_json()
   if (is.null(cat)) {
@@ -608,11 +703,11 @@ car_quality_summary <- function(state = NULL) {
   con <- car_con()
   quoted <- as.character(DBI::dbQuoteString(con, unlist(files)))
   out <- DBI::dbGetQuery(con, paste0(
-    "SELECT * FROM read_parquet([", paste(quoted, collapse = ", "), "]) ORDER BY municipality_code"
+    "SELECT * FROM read_parquet([", paste(quoted, collapse = ", "),
+    "], union_by_name = true) ORDER BY municipality_code"
   ))
-  counts <- c("properties", "overlapping", "overlapping_half", "outside_half")
+  counts <- intersect(names(out), names(empty)[vapply(empty, is.integer, logical(1))])
   out[counts] <- lapply(out[counts], as.integer)
   names <- car_municipalities(state)[c("municipality_code", "municipality")]
-  out <- dplyr::left_join(tibble::as_tibble(out), names, by = "municipality_code")
-  out[names(empty)]
+  car_like(dplyr::left_join(tibble::as_tibble(out), names, by = "municipality_code"), empty)
 }

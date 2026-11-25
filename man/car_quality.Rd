@@ -17,14 +17,14 @@ car_quality_summary(state = NULL)
 só os trechos deles.}
 }
 \value{
-Um tibble. \code{car_quality()}: \code{property_code}, \code{municipality_code},
-\code{overlap_count}, \code{overlap_share} e \code{outside_share}; junte a
-\code{\link[=car_properties]{car_properties()}} por \code{property_code}. Zero linhas (com aviso) se a
-publicação não responder ou não trouxer os indicadores.
+Um tibble. \code{car_quality()}: \code{property_code}, \code{municipality_code}
+e os indicadores acima; junte a \code{\link[=car_properties]{car_properties()}} por \code{property_code}.
+Zero linhas (com aviso) se a publicação não responder ou não trouxer os
+indicadores; as colunas de terras indígenas e unidades de conservação
+vêm vazias se a publicação ainda não as traz.
 }
 \description{
-Dois sinais de inconsistência, calculados na publicação para cada imóvel
-não cancelado:
+Sinais calculados na publicação para cada imóvel não cancelado:
 }
 \details{
 \itemize{
@@ -32,7 +32,15 @@ não cancelado:
 ele divide área, e que parcela da área dele está sobreposta (a soma das
 interseções com cada vizinho, limitada a 1);
 \item \code{outside_share}: que parcela da área fica fora do município declarado,
-pela malha municipal do IBGE.
+pela malha municipal do IBGE;
+\item \code{indigenous_share}: que parcela fica dentro de terras indígenas (Funai,
+todas as fases do processo), com o nome da principal em
+\code{indigenous_land};
+\item \code{strict_protection_share} e \code{sustainable_use_share}: que parcela fica
+dentro de unidades de conservação de proteção integral e de uso
+sustentável (CNUC/MMA), com o nome e a categoria da principal em
+\code{conservation_unit} e \code{conservation_category} (a de proteção integral,
+se houver).
 }
 
 \code{car_quality()} traz os indicadores por imóvel; \code{car_quality_summary()},
@@ -40,11 +48,17 @@ o resumo por município: imóveis não cancelados (\code{properties}), quantos
 têm sobreposição acima de 1\% (\code{overlapping}) e de 50\% da área
 (\code{overlapping_half}), os hectares sobrepostos (\code{overlap_ha}, somando os
 dois lados de cada par), e quantos imóveis (\code{outside_half}) e hectares
-(\code{outside_ha}) ficam fora do município declarado.
+(\code{outside_ha}) ficam fora do município declarado; e, para terras
+indígenas (\code{indigenous}), unidades de proteção integral
+(\code{strict_protection}) e de uso sustentável (\code{sustainable_use}), quantos
+imóveis têm mais de 1\% da área dentro delas e quantos hectares (\verb{*_ha}).
 
-Sobreposição não é sinônimo de disputa: inclui imóvel declarado duas
-vezes e lote dentro de assentamento. A comparação é só entre imóveis do
-mesmo estado.
+Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
+declarado duas vezes e lote dentro de assentamento; a comparação é só
+entre imóveis do mesmo estado. Estar em unidade de uso sustentável também
+não é irregularidade: áreas de proteção ambiental (APA) e reservas
+particulares (RPPN) admitem imóveis privados. As edições das camadas
+estão em \code{source$protected_areas} no catálogo.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
