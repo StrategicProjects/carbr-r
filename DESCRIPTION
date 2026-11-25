@@ -45,9 +45,11 @@ Suggests:
     blob,
     ggplot2,
     knitr,
+    maptiles,
     rmarkdown,
     sf,
     testthat (>= 3.0.0),
+    tidyterra,
     withr
 VignetteBuilder:
     knitr

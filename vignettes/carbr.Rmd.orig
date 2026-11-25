@@ -144,36 +144,64 @@ car_municipalities() |>
 
 ## Imóveis de um município
 
-Os filtros de `car_properties()` são aplicados antes da leitura. Aqui, os
-imóveis médios e grandes de Petrolina, em Pernambuco — algumas centenas, de
-um arquivo com mais de 400 mil. Com o pacote `sf` instalado, o resultado é um objeto `sf`
-em SIRGAS 2000.
+`car_properties()` traz os imóveis de uma UF, com filtros aplicados antes
+da leitura: só os trechos do arquivo que atendem ao filtro são
+transferidos. Aqui, todos os imóveis de Petrolina, em Pernambuco — cerca de
+11 mil, de um arquivo estadual com mais de 400 mil. Com o pacote `sf`
+instalado, o resultado é um objeto `sf` em SIRGAS 2000.
 
 ```{r}
-petrolina <- car_properties(
-  "PE",
-  municipality = "Petrolina",
-  size_class = c("medium", "large")
-)
+petrolina <- car_properties("PE", municipality = "Petrolina")
 petrolina |> select(property_code, status, area_ha, fiscal_modules, size_class)
 ```
 
-```{r petrolina, fig.alt = "Mapa dos imóveis médios e grandes declarados no CAR em Petrolina."}
-ggplot(petrolina) +
-  geom_sf(aes(fill = size_class), colour = "white", linewidth = 0.1, alpha = 0.8) +
+Sobre uma imagem de satélite, o cadastro mostra a ocupação do município: os
+lotes estreitos dos perímetros irrigados junto ao rio São Francisco, ao sul
+e a leste, e os imóveis maiores da caatinga, ao norte. O fundo vem do pacote
+`maptiles` e é desenhado com o `tidyterra`.
+
+```{r petrolina, fig.height = 7.6, fig.alt = "Mapa dos imóveis declarados no CAR em Petrolina sobre imagem de satélite, coloridos por porte."}
+valid <- petrolina |>
+  filter(geometry_valid, status != "cancelled") |>
+  mutate(size_class = factor(size_class, c("small", "medium", "large"))) |>
+  arrange(desc(area_ha))
+
+imagery <- maptiles::get_tiles(valid, provider = "Esri.WorldImagery", zoom = 10, crop = TRUE)
+
+ggplot() +
+  tidyterra::geom_spatraster_rgb(data = imagery, maxcell = 2e6) +
+  geom_sf(
+    data = valid, aes(fill = size_class, colour = size_class),
+    linewidth = 0.15, alpha = 0.55
+  ) +
   scale_fill_manual(
-    values = c(medium = "#8fbf9f", large = "#1f5f3a"),
-    breaks = c("medium", "large"),
-    labels = c(medium = "Médio (4 a 15 módulos fiscais)", large = "Grande (acima de 15)"),
-    name = NULL
+    values = c(small = "#ffe066", medium = "#ff922b", large = "#e03131"),
+    labels = c("Pequeno (até 4 módulos fiscais)", "Médio (4 a 15)", "Grande (acima de 15)"),
+    name = NULL, aesthetics = c("fill", "colour")
   ) +
+  coord_sf(expand = FALSE) +
   labs(
-    title = "Imóveis médios e grandes no CAR",
-    subtitle = "Petrolina, Pernambuco",
-    caption = "Fonte: SFB/Sicar, via carbr. Cadastro autodeclarado, com sobreposições."
+    title = "Imóveis declarados no CAR em Petrolina, Pernambuco",
+    subtitle = paste(nrow(valid), "cadastros ativos ou pendentes, por porte"),
+    caption = "Fonte: SFB/Sicar, via carbr. Imagem: Esri World Imagery (Esri e colaboradores)."
   ) +
-  theme_minimal() +
-  theme(legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_void() +
+  theme(
+    legend.position = "bottom", plot.title = element_text(face = "bold"),
+    plot.margin = margin(6, 6, 6, 6)
+  )
+```
+
+Os filtros combinam. Só os imóveis grandes com cadastro ativo:
+
+```{r}
+car_properties(
+  "PE",
+  municipality = "Petrolina", size_class = "large", status = "active",
+  geometry = FALSE
+) |>
+  arrange(desc(area_ha)) |>
+  select(property_code, area_ha, fiscal_modules, condition)
 ```
 
 O município pode ser dado pelo nome (sem diferenciar maiúsculas nem acentos)
