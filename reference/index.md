@@ -29,11 +29,17 @@ O que está publicado e o que cada coluna significa.
 - [`car_cite()`](https://strategicprojects.github.io/carbr-r/reference/car_cite.md)
   : Como citar os dados
 
-## Cache e opções
+## Instalação, cache e opções
+
+- [`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md)
+  :
+
+  Instalar a extensão `httpfs` do DuckDB
 
 - [`car_cache_dir()`](https://strategicprojects.github.io/carbr-r/reference/car_cache_dir.md)
   [`car_cache_clear()`](https://strategicprojects.github.io/carbr-r/reference/car_cache_dir.md)
   : Pasta de cache do carbr
+
 - [`carbr`](https://strategicprojects.github.io/carbr-r/reference/carbr-package.md)
   [`carbr-package`](https://strategicprojects.github.io/carbr-r/reference/carbr-package.md)
   : carbr: Access the Rural Environmental Registry of Brazil ('CAR')

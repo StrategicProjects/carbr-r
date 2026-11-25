@@ -20,6 +20,16 @@ não passa pelos servidores do Sicar.
 pak::pak("StrategicProjects/carbr-r")
 ```
 
+Para ler só os trechos necessários dos arquivos remotos, o `carbr` usa o
+DuckDB com a extensão oficial `httpfs` (código aberto, MIT). Na primeira
+consulta, em sessão interativa, o pacote pergunta se pode instalá-la. Em
+scripts e relatórios, rode uma vez:
+
+``` r
+
+carbr::car_install_httpfs()
+```
+
 ## Uso
 
 ``` r

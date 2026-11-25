@@ -20,6 +20,16 @@ não passa pelos servidores do Sicar.
 pak::pak("StrategicProjects/carbr-r")
 ```
 
+Para ler só os trechos necessários dos arquivos remotos, o `carbr` usa o
+DuckDB com a extensão oficial `httpfs` (código aberto, MIT). Na primeira
+consulta, em sessão interativa, o pacote pergunta se pode instalá-la. Em
+scripts e relatórios, rode uma vez:
+
+``` r
+
+carbr::car_install_httpfs()
+```
+
 ## Uso
 
 ``` r
@@ -124,11 +134,17 @@ O que está publicado e o que cada coluna significa.
 - [`car_cite()`](https://strategicprojects.github.io/carbr-r/reference/car_cite.md)
   : Como citar os dados
 
-## Cache e opções
+## Instalação, cache e opções
+
+- [`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md)
+  :
+
+  Instalar a extensão `httpfs` do DuckDB
 
 - [`car_cache_dir()`](https://strategicprojects.github.io/carbr-r/reference/car_cache_dir.md)
   [`car_cache_clear()`](https://strategicprojects.github.io/carbr-r/reference/car_cache_dir.md)
   : Pasta de cache do carbr
+
 - [`carbr`](https://strategicprojects.github.io/carbr-r/reference/carbr-package.md)
   [`carbr-package`](https://strategicprojects.github.io/carbr-r/reference/carbr-package.md)
   : carbr: Access the Rural Environmental Registry of Brazil ('CAR')

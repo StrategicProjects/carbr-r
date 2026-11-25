@@ -20,6 +20,12 @@ base de um estado inteiro e sem passar pelos servidores do Sicar.
 | [`car_tbl()`](https://strategicprojects.github.io/carbr-r/reference/car_tbl.md) | Tabela preguiçosa para o `dplyr` |
 | [`car_cite()`](https://strategicprojects.github.io/carbr-r/reference/car_cite.md) | Como citar |
 
+A leitura parcial é feita pelo DuckDB com a extensão oficial `httpfs`.
+Na primeira consulta, em sessão interativa, o pacote pergunta se pode
+instalá-la; em scripts e relatórios, rode
+[`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md)
+uma vez.
+
 ``` r
 
 library(carbr)

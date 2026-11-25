@@ -19,3 +19,6 @@
   lê um resumo pré-calculado: totais nacionais em segundos.
 - Guias: “Primeiros passos”, “Inconsistências do cadastro” e “Onde a
   análise está parada”.
+- A extensão `httpfs` do DuckDB só é instalada com confirmação: o pacote
+  pergunta em sessão interativa; em scripts,
+  [`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md).

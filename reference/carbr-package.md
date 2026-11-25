@@ -18,6 +18,10 @@ their published 'SHA-256'. Network failures are handled gracefully.
   espelho ou para uma cópia local. A árvore tem `catalog.json`,
   `dictionary.json`, `municipalities/` e `properties/state=<UF>/`.
 
+- `carbr.install_httpfs`: `TRUE` autoriza instalar a extensão `httpfs`
+  do DuckDB sem perguntar; ver
+  [`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md).
+
 - `carbr.quiet`: silencia as mensagens informativas. Padrão `TRUE` em
   sessões não interativas.
 
