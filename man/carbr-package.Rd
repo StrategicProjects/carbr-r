@@ -49,7 +49,7 @@ Authors:
   \item Hugo Vasconcelos \email{hugo.vasconcelos@ufpe.br} (\href{https://orcid.org/0000-0001-6249-0920}{ORCID})
   \item Carlos Amorim \email{carlos.agaf@ufpe.br} (\href{https://orcid.org/0000-0001-6315-8305}{ORCID})
   \item Diogo Bezerra \email{diogo.bezerra@ufpe.br} (\href{https://orcid.org/0000-0002-1216-8674}{ORCID})
-  \item Hortênsia Nunes Braz de Oliveira (\href{https://orcid.org/0009-0002-3638-7211}{ORCID})
+  \item Hortênsia Nunes Braz de Oliveira \email{hortensia.nunes@condepefidem.pe.gov.br} (\href{https://orcid.org/0009-0002-3638-7211}{ORCID})
 }
 
 }
