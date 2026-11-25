@@ -7,7 +7,7 @@ guia usa a coluna `condition`, a etapa da análise informada pelo Sicar,
 para mostrar onde cada UF está e quem espera por quem.
 
 Tudo aqui sai do resumo pré-calculado
-([`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md)),
+([`car_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_summary.md)),
 em segundos, menos o mapa do fim, que lê duas colunas de um estado.
 
 ``` r
@@ -182,7 +182,7 @@ plot of chunk anos
 ## Onde, dentro de um estado
 
 O resumo vai até a UF. Para descer ao município,
-[`car_tbl()`](https://strategicprojects.github.io/carbr-r/reference/car_tbl.md)
+[`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md)
 lê só as duas colunas necessárias do arquivo do estado. No Pará, a UF
 com mais notificações sem resposta:
 

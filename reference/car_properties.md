@@ -55,7 +55,7 @@ car_properties(
 ## Value
 
 Um tibble ou objeto `sf`, uma linha por imóvel; as colunas estão em
-[`car_dictionary()`](https://strategicprojects.github.io/carbr-r/reference/car_dictionary.md).
+[`car_dictionary()`](https://castlaboratory.github.io/carbr-r/reference/car_dictionary.md).
 Zero linhas (com aviso) se a publicação não responder.
 
 ## Examples

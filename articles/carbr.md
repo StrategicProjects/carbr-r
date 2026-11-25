@@ -10,20 +10,20 @@ base de um estado inteiro e sem passar pelos servidores do Sicar.
 
 | Função | Para quê |
 |----|----|
-| [`car_catalog()`](https://strategicprojects.github.io/carbr-r/reference/car_catalog.md) | O que está publicado |
-| [`car_dictionary()`](https://strategicprojects.github.io/carbr-r/reference/car_dictionary.md) | O que cada coluna significa |
-| [`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md) | Totais pré-calculados, do estado ou do país |
-| [`car_municipalities()`](https://strategicprojects.github.io/carbr-r/reference/car_municipalities.md) | Resumo por município |
-| [`car_properties()`](https://strategicprojects.github.io/carbr-r/reference/car_properties.md) | Imóveis de uma UF, com filtros |
-| [`car_property()`](https://strategicprojects.github.io/carbr-r/reference/car_property.md) | Um imóvel pelo código |
-| [`car_at()`](https://strategicprojects.github.io/carbr-r/reference/car_at.md) | Imóveis que contêm um ponto |
-| [`car_tbl()`](https://strategicprojects.github.io/carbr-r/reference/car_tbl.md) | Tabela preguiçosa para o `dplyr` |
-| [`car_cite()`](https://strategicprojects.github.io/carbr-r/reference/car_cite.md) | Como citar |
+| [`car_catalog()`](https://castlaboratory.github.io/carbr-r/reference/car_catalog.md) | O que está publicado |
+| [`car_dictionary()`](https://castlaboratory.github.io/carbr-r/reference/car_dictionary.md) | O que cada coluna significa |
+| [`car_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_summary.md) | Totais pré-calculados, do estado ou do país |
+| [`car_municipalities()`](https://castlaboratory.github.io/carbr-r/reference/car_municipalities.md) | Resumo por município |
+| [`car_properties()`](https://castlaboratory.github.io/carbr-r/reference/car_properties.md) | Imóveis de uma UF, com filtros |
+| [`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md) | Um imóvel pelo código |
+| [`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md) | Imóveis que contêm um ponto |
+| [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md) | Tabela preguiçosa para o `dplyr` |
+| [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md) | Como citar |
 
 A leitura parcial é feita pelo DuckDB com a extensão oficial `httpfs`.
 Na primeira consulta, em sessão interativa, o pacote pergunta se pode
 instalá-la; em scripts e relatórios, rode
-[`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md)
+[`car_install_httpfs()`](https://castlaboratory.github.io/carbr-r/reference/car_install_httpfs.md)
 uma vez.
 
 ``` r
@@ -35,7 +35,7 @@ library(ggplot2)
 
 ## O que está publicado
 
-[`car_catalog()`](https://strategicprojects.github.io/carbr-r/reference/car_catalog.md)
+[`car_catalog()`](https://castlaboratory.github.io/carbr-r/reference/car_catalog.md)
 traz uma linha por UF, com o número de imóveis e os indicadores de
 qualidade da carga. A versão é a data da última atualização da
 publicação.
@@ -127,7 +127,7 @@ car_dictionary() |> print(n = 22)
 
 ## O país inteiro, sem ler os imóveis
 
-[`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md)
+[`car_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_summary.md)
 lê tabelas pequenas, calculadas na publicação, com a contagem de imóveis
 e a área declarada por UF, situação, porte, tipo, etapa da análise e ano
 de criação do cadastro. O argumento `by` escolhe as dimensões; `NULL` dá
@@ -283,7 +283,7 @@ car_municipalities() |>
 
 ## Imóveis de um município
 
-[`car_properties()`](https://strategicprojects.github.io/carbr-r/reference/car_properties.md)
+[`car_properties()`](https://castlaboratory.github.io/carbr-r/reference/car_properties.md)
 traz os imóveis de uma UF, com filtros aplicados antes da leitura: só os
 trechos do arquivo que atendem ao filtro são transferidos. Aqui, todos
 os imóveis de Petrolina, em Pernambuco — cerca de 11 mil, de um arquivo
@@ -440,7 +440,7 @@ pending |> count(municipality, sort = TRUE)
 
 ## Que imóveis estão declarados aqui?
 
-[`car_at()`](https://strategicprojects.github.io/carbr-r/reference/car_at.md)
+[`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md)
 devolve os imóveis que contêm um ponto, procurando em todas as UFs (ou
 só nas de `state`). Como o cadastro é autodeclarado, sobreposições são
 comuns e o resultado pode ter mais de uma linha, como neste ponto do
@@ -496,9 +496,9 @@ car_property("PE-2611101-588BC484570D440484F527F07DF5AFFA", geometry = FALSE) |>
 ## Consultas próprias
 
 Para o que
-[`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md)
+[`car_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_summary.md)
 não cobre,
-[`car_tbl()`](https://strategicprojects.github.io/carbr-r/reference/car_tbl.md)
+[`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md)
 devolve uma tabela preguiçosa do `dplyr` sobre os arquivos publicados.
 Nada é lido até o
 [`collect()`](https://dplyr.tidyverse.org/reference/compute.html), e a
@@ -541,6 +541,6 @@ O pacote lê de um bucket público. Para usar um espelho compatível com S3
 ou uma cópia local da publicação, defina `options(carbr.base_url = )` ou
 a variável de ambiente `CAR_URL`. O catálogo e o resumo municipal ficam
 em cache em
-[`car_cache_dir()`](https://strategicprojects.github.io/carbr-r/reference/car_cache_dir.md),
+[`car_cache_dir()`](https://castlaboratory.github.io/carbr-r/reference/car_cache_dir.md),
 e o catálogo vale por seis horas (`car_catalog(refresh = TRUE)` o relê);
 os imóveis nunca são copiados para o disco.

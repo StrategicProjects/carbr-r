@@ -20,7 +20,7 @@ their published 'SHA-256'. Network failures are handled gracefully.
 
 - `carbr.install_httpfs`: `TRUE` autoriza instalar a extensão `httpfs`
   do DuckDB sem perguntar; ver
-  [`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md).
+  [`car_install_httpfs()`](https://castlaboratory.github.io/carbr-r/reference/car_install_httpfs.md).
 
 - `carbr.quiet`: silencia as mensagens informativas. Padrão `TRUE` em
   sessões não interativas.
@@ -39,11 +39,11 @@ their published 'SHA-256'. Network failures are handled gracefully.
 
 Useful links:
 
-- <https://github.com/StrategicProjects/carbr-r>
+- <https://github.com/castlaboratory/carbr-r>
 
-- <https://strategicprojects.github.io/carbr-r/>
+- <https://castlaboratory.github.io/carbr-r/>
 
-- Report bugs at <https://github.com/StrategicProjects/carbr-r/issues>
+- Report bugs at <https://github.com/castlaboratory/carbr-r/issues>
 
 ## Author
 

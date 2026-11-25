@@ -1,6 +1,6 @@
 # carbr
 
-[![R-CMD-check](https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
@@ -17,7 +17,7 @@ não passa pelos servidores do Sicar.
 ``` r
 
 # install.packages("pak")
-pak::pak("StrategicProjects/carbr-r")
+pak::pak("castlaboratory/carbr-r")
 ```
 
 Para ler só os trechos necessários dos arquivos remotos, o `carbr` usa o
@@ -57,26 +57,26 @@ car_tbl("PE") |>
 
 | Função | Para quê |
 |----|----|
-| [`car_catalog()`](https://strategicprojects.github.io/carbr-r/reference/car_catalog.md) | O que está publicado, com versão e indicadores de qualidade |
-| [`car_dictionary()`](https://strategicprojects.github.io/carbr-r/reference/car_dictionary.md) | Dicionário de dados: coluna, nome no Sicar, descrição |
-| [`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md) | Totais pré-calculados por UF, situação, porte, tipo, etapa da análise e ano |
-| [`car_municipalities()`](https://strategicprojects.github.io/carbr-r/reference/car_municipalities.md) | Resumo por município |
-| [`car_properties()`](https://strategicprojects.github.io/carbr-r/reference/car_properties.md) | Imóveis de uma UF, com filtros aplicados antes da leitura |
-| [`car_property()`](https://strategicprojects.github.io/carbr-r/reference/car_property.md) | Um imóvel pelo código |
-| [`car_at()`](https://strategicprojects.github.io/carbr-r/reference/car_at.md) | Imóveis que contêm um ponto |
-| [`car_tbl()`](https://strategicprojects.github.io/carbr-r/reference/car_tbl.md) | Tabela preguiçosa para consultas com `dplyr` |
-| [`car_cite()`](https://strategicprojects.github.io/carbr-r/reference/car_cite.md) | Como citar os dados |
+| [`car_catalog()`](https://castlaboratory.github.io/carbr-r/reference/car_catalog.md) | O que está publicado, com versão e indicadores de qualidade |
+| [`car_dictionary()`](https://castlaboratory.github.io/carbr-r/reference/car_dictionary.md) | Dicionário de dados: coluna, nome no Sicar, descrição |
+| [`car_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_summary.md) | Totais pré-calculados por UF, situação, porte, tipo, etapa da análise e ano |
+| [`car_municipalities()`](https://castlaboratory.github.io/carbr-r/reference/car_municipalities.md) | Resumo por município |
+| [`car_properties()`](https://castlaboratory.github.io/carbr-r/reference/car_properties.md) | Imóveis de uma UF, com filtros aplicados antes da leitura |
+| [`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md) | Um imóvel pelo código |
+| [`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md) | Imóveis que contêm um ponto |
+| [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md) | Tabela preguiçosa para consultas com `dplyr` |
+| [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md) | Como citar os dados |
 
 ## Guias
 
 - [Primeiros
-  passos](https://strategicprojects.github.io/carbr-r/articles/carbr.html)
+  passos](https://castlaboratory.github.io/carbr-r/articles/carbr.html)
 - [Inconsistências do
-  cadastro](https://strategicprojects.github.io/carbr-r/articles/inconsistencias.html):
+  cadastro](https://castlaboratory.github.io/carbr-r/articles/inconsistencias.html):
   sobreposições, imóveis fora do município, área declarada maior que o
   território.
 - [Onde a análise está
-  parada](https://strategicprojects.github.io/carbr-r/articles/analise.html):
+  parada](https://castlaboratory.github.io/carbr-r/articles/analise.html):
   as etapas da análise por UF e quem aguarda resposta à notificação.
 
 ## Os dados
@@ -101,19 +101,19 @@ car_tbl("PE") |>
   CastLab/UFPE. Não é um produto do Serviço Florestal Brasileiro nem
   substitui o Sicar; em caso de divergência, vale o Sicar.
 - **Cobertura:** as 27 UFs, cerca de 8,6 milhões de imóveis.
-  [`car_catalog()`](https://strategicprojects.github.io/carbr-r/reference/car_catalog.md)
+  [`car_catalog()`](https://castlaboratory.github.io/carbr-r/reference/car_catalog.md)
   mostra o que está publicado e a data.
 - **Endereço:** o padrão é um bucket público;
   `options(carbr.base_url = )` ou a variável `CAR_URL` apontam para um
   espelho compatível com S3 ou para uma pasta local.
 
 As mesmas funções existem em Python:
-[carbr-py](https://github.com/StrategicProjects/carbr-py).
+[carbr-py](https://github.com/castlaboratory/carbr-py).
 
 ## Licença
 
 Código sob licença MIT. Os dados são do Sicar; use
-[`car_cite()`](https://strategicprojects.github.io/carbr-r/reference/car_cite.md)
+[`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md)
 para citá-los.
 
 # Package index
@@ -122,44 +122,44 @@ para citá-los.
 
 O que está publicado e o que cada coluna significa.
 
-- [`car_catalog()`](https://strategicprojects.github.io/carbr-r/reference/car_catalog.md)
+- [`car_catalog()`](https://castlaboratory.github.io/carbr-r/reference/car_catalog.md)
   : O que está publicado
-- [`car_dictionary()`](https://strategicprojects.github.io/carbr-r/reference/car_dictionary.md)
+- [`car_dictionary()`](https://castlaboratory.github.io/carbr-r/reference/car_dictionary.md)
   : Dicionário de dados
-- [`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md)
+- [`car_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_summary.md)
   : Resumo pré-calculado
-- [`car_municipalities()`](https://strategicprojects.github.io/carbr-r/reference/car_municipalities.md)
+- [`car_municipalities()`](https://castlaboratory.github.io/carbr-r/reference/car_municipalities.md)
   : Resumo por município
 
 ## Obter os imóveis
 
-- [`car_properties()`](https://strategicprojects.github.io/carbr-r/reference/car_properties.md)
+- [`car_properties()`](https://castlaboratory.github.io/carbr-r/reference/car_properties.md)
   : Imóveis rurais declarados no CAR
-- [`car_property()`](https://strategicprojects.github.io/carbr-r/reference/car_property.md)
+- [`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md)
   : Um imóvel pelo código
-- [`car_at()`](https://strategicprojects.github.io/carbr-r/reference/car_at.md)
+- [`car_at()`](https://castlaboratory.github.io/carbr-r/reference/car_at.md)
   : Imóveis que contêm um ponto
-- [`car_tbl()`](https://strategicprojects.github.io/carbr-r/reference/car_tbl.md)
+- [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md)
   : Tabela preguiçosa dos imóveis
 
 ## Citar
 
-- [`car_cite()`](https://strategicprojects.github.io/carbr-r/reference/car_cite.md)
+- [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md)
   : Como citar os dados
 
 ## Instalação, cache e opções
 
-- [`car_install_httpfs()`](https://strategicprojects.github.io/carbr-r/reference/car_install_httpfs.md)
+- [`car_install_httpfs()`](https://castlaboratory.github.io/carbr-r/reference/car_install_httpfs.md)
   :
 
   Instalar a extensão `httpfs` do DuckDB
 
-- [`car_cache_dir()`](https://strategicprojects.github.io/carbr-r/reference/car_cache_dir.md)
-  [`car_cache_clear()`](https://strategicprojects.github.io/carbr-r/reference/car_cache_dir.md)
+- [`car_cache_dir()`](https://castlaboratory.github.io/carbr-r/reference/car_cache_dir.md)
+  [`car_cache_clear()`](https://castlaboratory.github.io/carbr-r/reference/car_cache_dir.md)
   : Pasta de cache do carbr
 
-- [`carbr`](https://strategicprojects.github.io/carbr-r/reference/carbr-package.md)
-  [`carbr-package`](https://strategicprojects.github.io/carbr-r/reference/carbr-package.md)
+- [`carbr`](https://castlaboratory.github.io/carbr-r/reference/carbr-package.md)
+  [`carbr-package`](https://castlaboratory.github.io/carbr-r/reference/carbr-package.md)
   : carbr: Access the Rural Environmental Registry of Brazil ('CAR')
 
 # Articles
@@ -167,8 +167,8 @@ O que está publicado e o que cada coluna significa.
 ### Guias
 
 - [Primeiros
-  passos](https://strategicprojects.github.io/carbr-r/articles/carbr.md):
+  passos](https://castlaboratory.github.io/carbr-r/articles/carbr.md):
 - [Inconsistências do
-  cadastro](https://strategicprojects.github.io/carbr-r/articles/inconsistencias.md):
+  cadastro](https://castlaboratory.github.io/carbr-r/articles/inconsistencias.md):
 - [Onde a análise está
-  parada](https://strategicprojects.github.io/carbr-r/articles/analise.md):
+  parada](https://castlaboratory.github.io/carbr-r/articles/analise.md):

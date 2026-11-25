@@ -19,7 +19,7 @@
 ">
 <meta property="og:description" content="Os imóveis rurais declarados no Cadastro Ambiental Rural (CAR), lidos de uma republicação em GeoParquet: consultas por UF, município, situação, porte, retângulo, ponto ou código, sem baixar a base inteira.
 ">
-<meta property="og:image" content="https://strategicprojects.github.io/carbr-r/logo.svg">
+<meta property="og:image" content="https://castlaboratory.github.io/carbr-r/logo.svg">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -53,7 +53,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/StrategicProjects/carbr-r/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/castlaboratory/carbr-r/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -75,7 +75,7 @@
 <a class="anchor" aria-label="anchor" href="#carbr-"></a>
 </h1>
 </div>
-<p><a href="https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a></p>
+<p><a href="https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a></p>
 <p>Os imóveis rurais declarados no <strong>Cadastro Ambiental Rural (CAR)</strong> no R, sem baixar a base inteira.</p>
 <p>O <code>carbr</code> lê uma republicação dos dados públicos do Sicar em GeoParquet. Cada consulta — por UF, município, situação, porte, retângulo, ponto ou código do imóvel — transfere só os trechos do arquivo de que precisa, e não passa pelos servidores do Sicar.</p>
 <div class="section level2">
@@ -83,7 +83,7 @@
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"StrategicProjects/carbr-r"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"castlaboratory/carbr-r"</span><span class="op">)</span></span></code></pre></div>
 <p>Para ler só os trechos necessários dos arquivos remotos, o <code>carbr</code> usa o DuckDB com a extensão oficial <code>httpfs</code> (código aberto, MIT). Na primeira consulta, em sessão interativa, o pacote pergunta se pode instalá-la. Em scripts e relatórios, rode uma vez:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">carbr</span><span class="fu">::</span><span class="fu"><a href="reference/car_install_httpfs.html">car_install_httpfs</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -92,7 +92,7 @@
 <h2 id="uso">Uso<a class="anchor" aria-label="anchor" href="#uso"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/StrategicProjects/carbr-r" class="external-link">carbr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/castlaboratory/carbr-r" class="external-link">carbr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/car_catalog.html">car_catalog</a></span><span class="op">(</span><span class="op">)</span>                       <span class="co"># UFs publicadas, versão e qualidade da carga</span></span>
 <span><span class="fu"><a href="reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state"</span>, <span class="st">"size_class"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># totais do país, sem ler os imóveis</span></span>
@@ -165,11 +165,11 @@
 <h2 id="guias">Guias<a class="anchor" aria-label="anchor" href="#guias"></a>
 </h2>
 <ul>
-<li><a href="https://strategicprojects.github.io/carbr-r/articles/carbr.html">Primeiros passos</a></li>
+<li><a href="https://castlaboratory.github.io/carbr-r/articles/carbr.html">Primeiros passos</a></li>
 <li>
-<a href="https://strategicprojects.github.io/carbr-r/articles/inconsistencias.html">Inconsistências do cadastro</a>: sobreposições, imóveis fora do município, área declarada maior que o território.</li>
+<a href="https://castlaboratory.github.io/carbr-r/articles/inconsistencias.html">Inconsistências do cadastro</a>: sobreposições, imóveis fora do município, área declarada maior que o território.</li>
 <li>
-<a href="https://strategicprojects.github.io/carbr-r/articles/analise.html">Onde a análise está parada</a>: as etapas da análise por UF e quem aguarda resposta à notificação.</li>
+<a href="https://castlaboratory.github.io/carbr-r/articles/analise.html">Onde a análise está parada</a>: as etapas da análise por UF e quem aguarda resposta à notificação.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -191,7 +191,7 @@
 <li>
 <strong>Endereço:</strong> o padrão é um bucket público; <code>options(carbr.base_url = )</code> ou a variável <code>CAR_URL</code> apontam para um espelho compatível com S3 ou para uma pasta local.</li>
 </ul>
-<p>As mesmas funções existem em Python: <a href="https://github.com/StrategicProjects/carbr-py" class="external-link">carbr-py</a>.</p>
+<p>As mesmas funções existem em Python: <a href="https://github.com/castlaboratory/carbr-py" class="external-link">carbr-py</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="licença">Licença<a class="anchor" aria-label="anchor" href="#licen%C3%A7a"></a>
@@ -202,8 +202,8 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/StrategicProjects/carbr-r/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/StrategicProjects/carbr-r/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/castlaboratory/carbr-r/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/castlaboratory/carbr-r/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 

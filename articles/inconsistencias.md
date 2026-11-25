@@ -297,6 +297,6 @@ imóvel (`property_type`) antes.
 
 Cada sinal acima vira uma lista de imóveis: `property_code` leva ao
 cadastro, e
-[`car_property()`](https://strategicprojects.github.io/carbr-r/reference/car_property.md)
+[`car_property()`](https://castlaboratory.github.io/carbr-r/reference/car_property.md)
 devolve o perímetro. Para repetir a análise em outro município ou outra
 UF, basta trocar os argumentos.
