@@ -75,9 +75,10 @@
 público eletrônico dos imóveis rurais do país, criado pelo Código
 Florestal (Lei nº 12.651/2012) e mantido no Sicar pelo Serviço Florestal
 Brasileiro. O <code>carbr</code> lê uma republicação dos dados públicos
-do cadastro em GeoParquet: cada consulta transfere só os trechos do
-arquivo de que precisa, sem baixar a base de um estado inteiro e sem
-passar pelos servidores do Sicar.</p>
+do cadastro em GeoParquet, com as 27 UFs e cerca de 8,6 milhões de
+imóveis. Cada consulta transfere só os trechos do arquivo de que
+precisa, sem baixar a base de um estado inteiro e sem passar pelos
+servidores do Sicar.</p>
 <table class="table">
 <thead><tr class="header">
 <th>Função</th>
@@ -93,27 +94,31 @@ passar pelos servidores do Sicar.</p>
 <td>O que cada coluna significa</td>
 </tr>
 <tr class="odd">
+<td><code><a href="../reference/car_summary.html">car_summary()</a></code></td>
+<td>Totais pré-calculados, do estado ou do país</td>
+</tr>
+<tr class="even">
 <td><code><a href="../reference/car_municipalities.html">car_municipalities()</a></code></td>
 <td>Resumo por município</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code><a href="../reference/car_properties.html">car_properties()</a></code></td>
 <td>Imóveis de uma UF, com filtros</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code><a href="../reference/car_property.html">car_property()</a></code></td>
 <td>Um imóvel pelo código</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code><a href="../reference/car_at.html">car_at()</a></code></td>
 <td>Imóveis que contêm um ponto</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code><a href="../reference/car_tbl.html">car_tbl()</a></code></td>
 <td>Tabela preguiçosa para o <code>dplyr</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code><a href="../reference/car_cite.html">car_cite()</a></code></td>
 <td>Como citar</td>
 </tr>
@@ -127,20 +132,33 @@ passar pelos servidores do Sicar.</p>
 <h2 id="o-que-está-publicado">O que está publicado<a class="anchor" aria-label="anchor" href="#o-que-est%C3%A1-publicado"></a>
 </h2>
 <p><code><a href="../reference/car_catalog.html">car_catalog()</a></code> traz uma linha por UF, com o número de
-imóveis e os indicadores de qualidade da carga. A versão é a data em que
-os dados foram lidos do Sicar.</p>
+imóveis e os indicadores de qualidade da carga. A versão é a data da
+última atualização da publicação.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/car_catalog.html">car_catalog</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">cat</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
+<span><span class="co">#&gt; # A tibble: 27 × 6</span></span>
 <span><span class="co">#&gt;   state properties municipalities invalid_geometries null_geometries</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;      &lt;int&gt;          &lt;int&gt;              &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1 PE        436190            184                 50               0</span></span>
+<span><span class="co">#&gt; 1 AC         63349             22                 19               0</span></span>
+<span><span class="co">#&gt; 2 AL        143973            102                 19               0</span></span>
+<span><span class="co">#&gt; 3 AM         99056             62                 94               0</span></span>
+<span><span class="co">#&gt; 4 AP         17834             16                  2               0</span></span>
+<span><span class="co">#&gt; 5 BA       1334593            416                  2               0</span></span>
+<span><span class="co">#&gt; 6 CE        410650            184                 56               0</span></span>
 <span><span class="co">#&gt;   registered_in_other_state</span></span>
 <span><span class="co">#&gt;                       &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1                         7</span></span>
+<span><span class="co">#&gt; 1                         0</span></span>
+<span><span class="co">#&gt; 2                         5</span></span>
+<span><span class="co">#&gt; 3                         0</span></span>
+<span><span class="co">#&gt; 4                         0</span></span>
+<span><span class="co">#&gt; 5                         1</span></span>
+<span><span class="co">#&gt; 6                         3</span></span>
+<span><span class="co">#&gt; # ℹ 21 more rows</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">cat</span>, <span class="st">"version"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2026-11-25"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "2026-11-25"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">cat</span><span class="op">$</span><span class="va">properties</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 8578061</span></span></code></pre></div>
 <p>O dicionário de dados diz o que é cada coluna e qual era o seu nome
 no Sicar.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -196,34 +214,151 @@ no Sicar.</p>
 <span><span class="co">#&gt; 22 Perímetro declarado do imóvel, WKB, EPSG:4674. Nulo se o Sicar não traz.</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="o-país-inteiro-sem-ler-os-imóveis">O país inteiro, sem ler os imóveis<a class="anchor" aria-label="anchor" href="#o-pa%C3%ADs-inteiro-sem-ler-os-im%C3%B3veis"></a>
+</h2>
+<p><code><a href="../reference/car_summary.html">car_summary()</a></code> lê tabelas pequenas, calculadas na
+publicação, com a contagem de imóveis e a área declarada por UF,
+situação, porte, tipo, etapa da análise e ano de criação do cadastro. O
+argumento <code>by</code> escolhe as dimensões; <code>NULL</code> dá o
+total.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 2</span></span>
+<span><span class="co">#&gt;   properties    area_ha</span></span>
+<span><span class="co">#&gt;        &lt;int&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1    8578061 816130359.</span></span>
+<span><span class="fu"><a href="../reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="st">"size_class"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 3</span></span>
+<span><span class="co">#&gt;   size_class properties    area_ha</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;           &lt;int&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 large          142974 410551844.</span></span>
+<span><span class="co">#&gt; 2 medium         398351 133970230.</span></span>
+<span><span class="co">#&gt; 3 small         8036736 271608284.</span></span></code></pre></div>
+<p>Os pequenos imóveis, de até quatro módulos fiscais, são mais de nove
+em cada dez cadastros e um terço da área declarada. Por UF:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">by_state</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state"</span>, <span class="st">"size_class"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">by_state</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">state</span>, <span class="va">properties</span>, <span class="va">sum</span><span class="op">)</span>,</span>
+<span>    size_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">size_class</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"large"</span>, <span class="st">"medium"</span>, <span class="st">"small"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">properties</span> <span class="op">/</span> <span class="fl">1e3</span>, <span class="va">state</span>, fill <span class="op">=</span> <span class="va">size_class</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
+<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>small <span class="op">=</span> <span class="st">"#8fbf9f"</span>, medium <span class="op">=</span> <span class="st">"#3d8a5c"</span>, large <span class="op">=</span> <span class="st">"#123a23"</span><span class="op">)</span>,</span>
+<span>    breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"small"</span>, <span class="st">"medium"</span>, <span class="st">"large"</span><span class="op">)</span>,</span>
+<span>    labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Pequeno (até 4 módulos fiscais)"</span>, <span class="st">"Médio (4 a 15)"</span>, <span class="st">"Grande (acima de 15)"</span><span class="op">)</span>,</span>
+<span>    name <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Imóveis declarados no CAR, por UF e porte"</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"Milhares de imóveis"</span>, y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>    caption <span class="op">=</span> <span class="st">"Fonte: SFB/Sicar, via carbr."</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="carbr-estados-1.png" alt="Barras horizontais com o número de imóveis no CAR por UF, separadas por porte."><p class="caption">
+plot of chunk estados
+</p>
+</div>
+<p>A etapa da análise mostra onde o cadastro está parado:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="st">"condition"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">properties</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>share <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="va">properties</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">properties</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">condition</span>, <span class="va">properties</span>, <span class="va">share</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 15 × 3</span></span>
+<span><span class="co">#&gt;   condition                                                                 </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                                                                     </span></span>
+<span><span class="co">#&gt; 1 Aguardando análise                                                        </span></span>
+<span><span class="co">#&gt; 2 Analisado, aguardando atendimento a notificação                           </span></span>
+<span><span class="co">#&gt; 3 Analisado, em conformidade com a Lei nº 12.651/2012                       </span></span>
+<span><span class="co">#&gt; 4 Analisado, em conformidade com a Lei nº 12.651/2012, com ativos ambientais</span></span>
+<span><span class="co">#&gt; 5 Analisado, aguardando regularização ambiental (Lei nº 12.651/2012)        </span></span>
+<span><span class="co">#&gt; 6 Cancelado por decisão administrativa                                      </span></span>
+<span><span class="co">#&gt; 7 Aguardando análise, após revisão ou atendimento da notificação            </span></span>
+<span><span class="co">#&gt; 8 Em análise                                                                </span></span>
+<span><span class="co">#&gt;   properties share</span></span>
+<span><span class="co">#&gt;        &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1    5978543  69.7</span></span>
+<span><span class="co">#&gt; 2    1309315  15.3</span></span>
+<span><span class="co">#&gt; 3     460502   5.4</span></span>
+<span><span class="co">#&gt; 4     191767   2.2</span></span>
+<span><span class="co">#&gt; 5     189447   2.2</span></span>
+<span><span class="co">#&gt; 6     161970   1.9</span></span>
+<span><span class="co">#&gt; 7     134338   1.6</span></span>
+<span><span class="co">#&gt; 8     109335   1.3</span></span>
+<span><span class="co">#&gt; # ℹ 7 more rows</span></span></code></pre></div>
+<p>E o ano de criação dá a linha do tempo do cadastramento:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="st">"created_year"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">created_year</span>, <span class="va">properties</span> <span class="op">/</span> <span class="fl">1e3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"#1f5f3a"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">2014</span><span class="op">:</span><span class="fl">2026</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Cadastros hoje no CAR, por ano de criação"</span>,</span>
+<span>    x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Milhares de imóveis"</span>,</span>
+<span>    caption <span class="op">=</span> <span class="st">"Fonte: SFB/Sicar, via carbr. O último ano está incompleto."</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="carbr-anos-1.png" alt="Colunas com o número de cadastros criados por ano, de 2014 a 2026."><p class="caption">
+plot of chunk anos
+</p>
+</div>
+<p>As dimensões combinam, e <code>state</code> restringe a uma ou mais
+UFs:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"status"</span>, <span class="st">"size_class"</span><span class="op">)</span>, state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PE"</span>, <span class="st">"BA"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 12 × 4</span></span>
+<span><span class="co">#&gt;    status    size_class properties   area_ha</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;     &lt;chr&gt;           &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 active    large            8236 15511306.</span></span>
+<span><span class="co">#&gt;  2 active    medium          27968  9622438.</span></span>
+<span><span class="co">#&gt;  3 active    small         1725262 23741938.</span></span>
+<span><span class="co">#&gt;  4 cancelled large             164   760332.</span></span>
+<span><span class="co">#&gt;  5 cancelled medium            250    94439.</span></span>
+<span><span class="co">#&gt;  6 cancelled small            4541   232247.</span></span>
+<span><span class="co">#&gt;  7 pending   large             222   487656.</span></span>
+<span><span class="co">#&gt;  8 pending   medium            420   137210.</span></span>
+<span><span class="co">#&gt;  9 pending   small            3669    87631.</span></span>
+<span><span class="co">#&gt; 10 suspended large              13    67994.</span></span>
+<span><span class="co">#&gt; 11 suspended medium              8     2959.</span></span>
+<span><span class="co">#&gt; 12 suspended small              30     2373.</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="resumo-por-município">Resumo por município<a class="anchor" aria-label="anchor" href="#resumo-por-munic%C3%ADpio"></a>
 </h2>
-<p>Para contagens, não é preciso ler os imóveis: o resumo municipal é um
-arquivo pequeno, guardado em cache.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_municipalities.html">car_municipalities</a></span><span class="op">(</span><span class="st">"PE"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<p>O resumo municipal também é pré-calculado. Sem argumento, traz os
+municípios de todas as UFs.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_municipalities.html">car_municipalities</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">properties</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">municipality</span>, <span class="va">properties</span>, <span class="va">small_properties</span>, <span class="va">area_ha</span>, <span class="va">pending</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 184 × 5</span></span>
-<span><span class="co">#&gt;   municipality properties small_properties area_ha pending</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;             &lt;int&gt;            &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1 Araripina         15663            15625 187423.       1</span></span>
-<span><span class="co">#&gt; 2 Ouricuri          14200            14182 219157.       6</span></span>
-<span><span class="co">#&gt; 3 Petrolina         10918            10799 411153.      11</span></span>
-<span><span class="co">#&gt; 4 Buíque             9734             9651 109496.       3</span></span>
-<span><span class="co">#&gt; 5 Bodocó             7271             7236 147941.       2</span></span>
-<span><span class="co">#&gt; 6 Custódia           6598             6540 153166.       1</span></span>
-<span><span class="co">#&gt; # ℹ 178 more rows</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">state</span>, <span class="va">municipality</span>, <span class="va">properties</span>, <span class="va">small_properties</span>, <span class="va">area_ha</span>, <span class="va">pending</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 5,564 × 6</span></span>
+<span><span class="co">#&gt;   state municipality      properties small_properties  area_ha pending</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;                  &lt;int&gt;            &lt;int&gt;    &lt;dbl&gt;   &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 RO    Porto Velho            25819            24145 3296893.    5446</span></span>
+<span><span class="co">#&gt; 2 BA    Monte Santo            24609            24541  188974.       0</span></span>
+<span><span class="co">#&gt; 3 DF    Brasília               21049            17597 1202233.     135</span></span>
+<span><span class="co">#&gt; 4 BA    Pilão Arcado           16403            16241 1061906.       1</span></span>
+<span><span class="co">#&gt; 5 PE    Araripina              15663            15625  187423.       1</span></span>
+<span><span class="co">#&gt; 6 BA    Euclides da Cunha      14962            14892  135744.      44</span></span>
+<span><span class="co">#&gt; # ℹ 5,558 more rows</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="imóveis-de-um-município">Imóveis de um município<a class="anchor" aria-label="anchor" href="#im%C3%B3veis-de-um-munic%C3%ADpio"></a>
 </h2>
 <p>Os filtros de <code><a href="../reference/car_properties.html">car_properties()</a></code> são aplicados antes da
-leitura. Aqui, os imóveis médios e grandes de Petrolina — algumas
-centenas, de um arquivo com mais de 400 mil. Com o pacote
+leitura. Aqui, os imóveis médios e grandes de Petrolina, em Pernambuco —
+algumas centenas, de um arquivo com mais de 400 mil. Com o pacote
 <code>sf</code> instalado, o resultado é um objeto <code>sf</code> em
 SIRGAS 2000.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">petrolina</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/car_properties.html">car_properties</a></span><span class="op">(</span></span>
 <span>  <span class="st">"PE"</span>,</span>
 <span>  municipality <span class="op">=</span> <span class="st">"Petrolina"</span>,</span>
@@ -253,7 +388,7 @@ SIRGAS 2000.</p>
 <span><span class="co">#&gt; 5 medium     (((-40.67597 -9.459559, -40.64619 -9.406101, -40.65469 -9.401102, …</span></span>
 <span><span class="co">#&gt; 6 medium     (((-40.68179 -9.449823, -40.67185 -9.431734, -40.65942 -9.409054, …</span></span>
 <span><span class="co">#&gt; # ℹ 113 more rows</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">petrolina</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">size_class</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"white"</span>, linewidth <span class="op">=</span> <span class="fl">0.1</span>, alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
@@ -284,7 +419,7 @@ acentos) ou pelo código IBGE de sete dígitos. Os outros filtros são
 <p>A geometria é a parte pesada do arquivo. Quando só os atributos
 interessam, <code>geometry = FALSE</code> deixa de transferi-la. Os
 cadastros pendentes de Pernambuco, por município:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pending</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/car_properties.html">car_properties</a></span><span class="op">(</span><span class="st">"PE"</span>, status <span class="op">=</span> <span class="st">"pending"</span>, geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">pending</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">municipality</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 100 × 2</span></span>
@@ -301,25 +436,28 @@ cadastros pendentes de Pernambuco, por município:</p>
 <div class="section level2">
 <h2 id="que-imóveis-estão-declarados-aqui">Que imóveis estão declarados aqui?<a class="anchor" aria-label="anchor" href="#que-im%C3%B3veis-est%C3%A3o-declarados-aqui"></a>
 </h2>
-<p><code><a href="../reference/car_at.html">car_at()</a></code> devolve os imóveis que contêm um ponto. Como o
+<p><code><a href="../reference/car_at.html">car_at()</a></code> devolve os imóveis que contêm um ponto,
+procurando em todas as UFs (ou só nas de <code>state</code>). Como o
 cadastro é autodeclarado, sobreposições são comuns e o resultado pode
-ter mais de uma linha.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_at.html">car_at</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="op">-</span><span class="fl">40.5</span>, lat <span class="op">=</span> <span class="op">-</span><span class="fl">9.2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+ter mais de uma linha, como neste ponto do Distrito Federal:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_at.html">car_at</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="op">-</span><span class="fl">47.9</span>, lat <span class="op">=</span> <span class="op">-</span><span class="fl">15.8</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">property_code</span>, <span class="va">municipality</span>, <span class="va">area_ha</span>, <span class="va">status</span>, <span class="va">condition</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
-<span><span class="co">#&gt;   property_code                               municipality area_ha status</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                                       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; </span></span>
-<span><span class="co">#&gt; 1 PE-2611101-588BC484570D440484F527F07DF5AFFA Petrolina     81579. active</span></span>
-<span><span class="co">#&gt;   condition         </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;             </span></span>
-<span><span class="co">#&gt; 1 Aguardando análise</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 2 × 5</span></span>
+<span><span class="co">#&gt;   property_code                               municipality area_ha status   </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                                       &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 DF-5300108-AB840D7B499B43E69C3D999165FF2475 Brasília      94379. cancelled</span></span>
+<span><span class="co">#&gt; 2 DF-5300108-1274A9532343473DB7413440C0ABF8AD Brasília     103415. cancelled</span></span>
+<span><span class="co">#&gt;   condition                           </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                               </span></span>
+<span><span class="co">#&gt; 1 Cancelado por decisão administrativa</span></span>
+<span><span class="co">#&gt; 2 Cancelado por decisão administrativa</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="um-imóvel-pelo-código">Um imóvel pelo código<a class="anchor" aria-label="anchor" href="#um-im%C3%B3vel-pelo-c%C3%B3digo"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/car_property.html">car_property</a></span><span class="op">(</span><span class="st">"PE-2611101-588BC484570D440484F527F07DF5AFFA"</span>, geometry <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 1</span></span>
@@ -349,26 +487,33 @@ ter mais de uma linha.</p>
 <div class="section level2">
 <h2 id="consultas-próprias">Consultas próprias<a class="anchor" aria-label="anchor" href="#consultas-pr%C3%B3prias"></a>
 </h2>
-<p><code><a href="../reference/car_tbl.html">car_tbl()</a></code> devolve uma tabela preguiçosa do
+<p>Para o que <code><a href="../reference/car_summary.html">car_summary()</a></code> não cobre,
+<code><a href="../reference/car_tbl.html">car_tbl()</a></code> devolve uma tabela preguiçosa do
 <code>dplyr</code> sobre os arquivos publicados. Nada é lido até o
-<code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code>, e a agregação roda sobre o arquivo remoto lendo
-só as colunas usadas.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code>, e a consulta roda sobre o arquivo remoto lendo
+só as colunas usadas. Convém restringir a uma UF: sobre o país inteiro,
+uma agregação lê colunas de 8,6 milhões de linhas e leva minutos.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/car_tbl.html">car_tbl</a></span><span class="op">(</span><span class="st">"PE"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">size_class</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">fiscal_modules</span> <span class="op">&gt;</span> <span class="fl">15</span>, <span class="va">status</span> <span class="op">==</span> <span class="st">"active"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">municipality</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>properties <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, area_ha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area_ha</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">area_ha</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 3</span></span>
-<span><span class="co">#&gt;   size_class properties  area_ha</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 large            1373 1229005.</span></span>
-<span><span class="co">#&gt; 2 medium           5167 1272210.</span></span>
-<span><span class="co">#&gt; 3 small          429650 5934124.</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 5 × 3</span></span>
+<span><span class="co">#&gt;   municipality             properties area_ha</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                         &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Santa Maria da Boa Vista          7  44671.</span></span>
+<span><span class="co">#&gt; 2 Serra Talhada                    17  33847.</span></span>
+<span><span class="co">#&gt; 3 Floresta                         25  33767.</span></span>
+<span><span class="co">#&gt; 4 Ibimirim                         22  32990.</span></span>
+<span><span class="co">#&gt; 5 Tacaratu                         12  32455.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="como-citar">Como citar<a class="anchor" aria-label="anchor" href="#como-citar"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/car_cite.html">car_cite</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Serviço Florestal Brasileiro. Sistema Nacional de Cadastro Ambiental Rural</span></span>
 <span><span class="co">#&gt; (Sicar): imóveis rurais. Dados organizados pelo CastLab/UFPE (pacote carbr),</span></span>
@@ -381,8 +526,9 @@ só as colunas usadas.</p>
 S3 ou uma cópia local da publicação, defina
 <code>options(carbr.base_url = )</code> ou a variável de ambiente
 <code>CAR_URL</code>. O catálogo e o resumo municipal ficam em cache em
-<code><a href="../reference/car_cache_dir.html">car_cache_dir()</a></code>; os imóveis nunca são copiados para o
-disco.</p>
+<code><a href="../reference/car_cache_dir.html">car_cache_dir()</a></code>, e o catálogo vale por seis horas
+(<code>car_catalog(refresh = TRUE)</code> o relê); os imóveis nunca são
+copiados para o disco.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

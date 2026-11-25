@@ -85,6 +85,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/StrategicProjects/carbr-r" class="external-link">carbr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/car_catalog.html">car_catalog</a></span><span class="op">(</span><span class="op">)</span>                       <span class="co"># UFs publicadas, versão e qualidade da carga</span></span>
+<span><span class="fu"><a href="reference/car_summary.html">car_summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state"</span>, <span class="st">"size_class"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># totais do país, sem ler os imóveis</span></span>
 <span><span class="fu"><a href="reference/car_municipalities.html">car_municipalities</a></span><span class="op">(</span><span class="st">"PE"</span><span class="op">)</span>            <span class="co"># resumo por município</span></span>
 <span></span>
 <span><span class="co"># Imóveis grandes de Petrolina, como objeto sf</span></span>
@@ -117,6 +118,10 @@
 <tr>
 <td><code><a href="reference/car_dictionary.html">car_dictionary()</a></code></td>
 <td>Dicionário de dados: coluna, nome no Sicar, descrição</td>
+</tr>
+<tr>
+<td><code><a href="reference/car_summary.html">car_summary()</a></code></td>
+<td>Totais pré-calculados por UF, situação, porte, tipo, etapa da análise e ano</td>
 </tr>
 <tr>
 <td><code><a href="reference/car_municipalities.html">car_municipalities()</a></code></td>
@@ -155,7 +160,7 @@
 <li>
 <strong>Conteúdo:</strong> o perímetro declarado e dez atributos de cada imóvel (código, situação, etapa da análise, tipo, data, área, módulos fiscais, município). Não há dado pessoal.</li>
 <li>
-<strong>Cobertura:</strong> por enquanto, Pernambuco. <code><a href="reference/car_catalog.html">car_catalog()</a></code> mostra o que está publicado e a data.</li>
+<strong>Cobertura:</strong> as 27 UFs, cerca de 8,6 milhões de imóveis. <code><a href="reference/car_catalog.html">car_catalog()</a></code> mostra o que está publicado e a data.</li>
 <li>
 <strong>Endereço:</strong> o padrão é um bucket público; <code>options(carbr.base_url = )</code> ou a variável <code>CAR_URL</code> apontam para um espelho compatível com S3 ou para uma pasta local.</li>
 </ul>

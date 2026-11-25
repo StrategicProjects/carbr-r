@@ -8,6 +8,8 @@ O que está publicado e o que cada coluna significa.
   : O que está publicado
 - [`car_dictionary()`](https://strategicprojects.github.io/carbr-r/reference/car_dictionary.md)
   : Dicionário de dados
+- [`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md)
+  : Resumo pré-calculado
 - [`car_municipalities()`](https://strategicprojects.github.io/carbr-r/reference/car_municipalities.md)
   : Resumo por município
 
