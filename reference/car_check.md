@@ -24,7 +24,10 @@ Um tibble com uma linha por código, na ordem dada: `property_code`,
 `check`, `note` (o motivo, em português), `stage` (a etapa da análise:
 `"waiting"`, `"analysing"`, `"notified"`, `"answered"`, `"done"` ou
 `"cancelled"`), `status`, `condition`, `property_type`, `size_class`,
-`area_ha`, `fiscal_modules`, `state`, `municipality` e `created_at`.
+`area_ha`, `fiscal_modules`, `state`, `municipality`, `created_at` e,
+para os imóveis não cancelados, `indigenous_share`,
+`strict_protection_share`, `sustainable_use_share` (parcelas da área, de
+0 a 1) e `protected_area` (os nomes das áreas sobrepostas).
 
 ## Details
 
@@ -33,8 +36,9 @@ oficial:
 
 - `"ok"`: cadastro ativo, sem notificação pendente;
 
-- `"attention"`: cadastro pendente, ou analisado com notificação ainda
-  sem resposta do declarante;
+- `"attention"`: cadastro pendente, analisado com notificação ainda sem
+  resposta do declarante, ou com mais de 1% da área sobre terra indígena
+  ou unidade de conservação de proteção integral;
 
 - `"blocked"`: cadastro cancelado ou suspenso;
 
@@ -43,9 +47,12 @@ oficial:
 
 - `"invalid"`: texto que não tem o formato de um código do CAR.
 
-A verificação diz só o que a camada pública traz. Não cobre embargos,
-sobreposição com terras indígenas ou unidades de conservação, nem
-substitui a consulta oficial ao Sicar.
+A sobreposição com terras indígenas (Funai) e unidades de conservação
+(CNUC/MMA) é calculada na publicação, pelos perímetros declarados. Estar
+em unidade de uso sustentável é informado na nota, mas não muda o
+resultado: áreas de proteção ambiental e reservas particulares admitem
+imóveis privados. A verificação não cobre embargos nem outras áreas
+públicas, e não substitui a consulta oficial ao Sicar.
 
 ## Examples
 

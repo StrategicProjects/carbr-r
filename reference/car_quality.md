@@ -1,7 +1,6 @@
 # Indicadores de qualidade do cadastro
 
-Dois sinais de inconsistência, calculados na publicação para cada imóvel
-não cancelado:
+Sinais calculados na publicação para cada imóvel não cancelado:
 
 ## Usage
 
@@ -25,11 +24,12 @@ car_quality_summary(state = NULL)
 
 ## Value
 
-Um tibble. `car_quality()`: `property_code`, `municipality_code`,
-`overlap_count`, `overlap_share` e `outside_share`; junte a
+Um tibble. `car_quality()`: `property_code`, `municipality_code` e os
+indicadores acima; junte a
 [`car_properties()`](https://castlaboratory.github.io/carbr-r/reference/car_properties.md)
 por `property_code`. Zero linhas (com aviso) se a publicação não
-responder ou não trouxer os indicadores.
+responder ou não trouxer os indicadores; as colunas de terras indígenas
+e unidades de conservação vêm vazias se a publicação ainda não as traz.
 
 ## Details
 
@@ -38,18 +38,34 @@ responder ou não trouxer os indicadores.
   soma das interseções com cada vizinho, limitada a 1);
 
 - `outside_share`: que parcela da área fica fora do município declarado,
-  pela malha municipal do IBGE.
+  pela malha municipal do IBGE;
+
+- `indigenous_share`: que parcela fica dentro de terras indígenas
+  (Funai, todas as fases do processo), com o nome da principal em
+  `indigenous_land`;
+
+- `strict_protection_share` e `sustainable_use_share`: que parcela fica
+  dentro de unidades de conservação de proteção integral e de uso
+  sustentável (CNUC/MMA), com o nome e a categoria da principal em
+  `conservation_unit` e `conservation_category` (a de proteção integral,
+  se houver).
 
 `car_quality()` traz os indicadores por imóvel; `car_quality_summary()`,
 o resumo por município: imóveis não cancelados (`properties`), quantos
 têm sobreposição acima de 1% (`overlapping`) e de 50% da área
 (`overlapping_half`), os hectares sobrepostos (`overlap_ha`, somando os
 dois lados de cada par), e quantos imóveis (`outside_half`) e hectares
-(`outside_ha`) ficam fora do município declarado.
+(`outside_ha`) ficam fora do município declarado; e, para terras
+indígenas (`indigenous`), unidades de proteção integral
+(`strict_protection`) e de uso sustentável (`sustainable_use`), quantos
+imóveis têm mais de 1% da área dentro delas e quantos hectares (`*_ha`).
 
-Sobreposição não é sinônimo de disputa: inclui imóvel declarado duas
-vezes e lote dentro de assentamento. A comparação é só entre imóveis do
-mesmo estado.
+Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
+declarado duas vezes e lote dentro de assentamento; a comparação é só
+entre imóveis do mesmo estado. Estar em unidade de uso sustentável
+também não é irregularidade: áreas de proteção ambiental (APA) e
+reservas particulares (RPPN) admitem imóveis privados. As edições das
+camadas estão em `source$protected_areas` no catálogo.
 
 ## Examples
 

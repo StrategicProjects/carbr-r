@@ -2,6 +2,13 @@
 
 ## carbr (development version)
 
+- [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md)
+  passa a considerar a sobreposição com terras indígenas (Funai) e
+  unidades de conservação (CNUC/MMA);
+  [`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+  e
+  [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+  trazem as parcelas e os nomes.
 - [`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
   e
   [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md):

@@ -76,21 +76,28 @@ município, de modo que uma lista grande lê poucos trechos de cada arquivo.</p>
 <code>check</code>, <code>note</code> (o motivo, em português), <code>stage</code> (a etapa da análise:
 <code>"waiting"</code>, <code>"analysing"</code>, <code>"notified"</code>, <code>"answered"</code>, <code>"done"</code> ou
 <code>"cancelled"</code>), <code>status</code>, <code>condition</code>, <code>property_type</code>, <code>size_class</code>,
-<code>area_ha</code>, <code>fiscal_modules</code>, <code>state</code>, <code>municipality</code> e <code>created_at</code>.</p>
+<code>area_ha</code>, <code>fiscal_modules</code>, <code>state</code>, <code>municipality</code>, <code>created_at</code> e,
+para os imóveis não cancelados, <code>indigenous_share</code>,
+<code>strict_protection_share</code>, <code>sustainable_use_share</code> (parcelas da área, de
+0 a 1) e <code>protected_area</code> (os nomes das áreas sobrepostas).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>O resultado (<code>check</code>) é uma classificação do pacote, não uma regra
 oficial:</p><ul><li><p><code>"ok"</code>: cadastro ativo, sem notificação pendente;</p></li>
-<li><p><code>"attention"</code>: cadastro pendente, ou analisado com notificação ainda
-sem resposta do declarante;</p></li>
+<li><p><code>"attention"</code>: cadastro pendente, analisado com notificação ainda sem
+resposta do declarante, ou com mais de 1% da área sobre terra indígena
+ou unidade de conservação de proteção integral;</p></li>
 <li><p><code>"blocked"</code>: cadastro cancelado ou suspenso;</p></li>
 <li><p><code>"not_found"</code>: código que não está na publicação (pode ter sido
 cadastrado depois da última atualização);</p></li>
 <li><p><code>"invalid"</code>: texto que não tem o formato de um código do CAR.</p></li>
-</ul><p>A verificação diz só o que a camada pública traz. Não cobre embargos,
-sobreposição com terras indígenas ou unidades de conservação, nem
-substitui a consulta oficial ao Sicar.</p>
+</ul><p>A sobreposição com terras indígenas (Funai) e unidades de conservação
+(CNUC/MMA) é calculada na publicação, pelos perímetros declarados. Estar
+em unidade de uso sustentável é informado na nota, mas não muda o
+resultado: áreas de proteção ambiental e reservas particulares admitem
+imóveis privados. A verificação não cobre embargos nem outras áreas
+públicas, e não substitui a consulta oficial ao Sicar.</p>
     </div>
 
     <div class="section level2">
