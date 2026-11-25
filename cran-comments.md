@@ -10,7 +10,8 @@ remote files they need.
 
 0 errors | 0 warnings | 0 notes locally (macOS, R 4.6.0), also with
 `_R_CHECK_DEPENDS_ONLY_=true`, and on GitHub Actions (Windows release;
-Ubuntu release, devel and oldrel-1).
+Ubuntu release, devel and oldrel-1), and on win-builder (R-devel,
+2026-11-17 r90926 ucrt).
 
 With the CRAN incoming checks, the only NOTE is the expected "New
 submission".

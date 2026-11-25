@@ -1,7 +1,7 @@
 # carbr <a href="https://strategicprojects.github.io/carbr-r/"><img src="man/figures/logo.svg" align="right" height="139" alt="carbr website" /></a>
 
 [![R-CMD-check](https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/StrategicProjects/carbr-r/actions/workflows/R-CMD-check.yaml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Os imóveis rurais declarados no **Cadastro Ambiental Rural (CAR)** no R, sem
 baixar a base inteira.
