@@ -1,5 +1,7 @@
 # carbr (development version)
 
+* `car_typology()` e `car_typology_groups()`: tipologia dos municípios em cinco grupos, pelo perfil do
+  cadastro (porte dos imóveis, etapa da análise e sobreposição).
 * `car_check()` passa a considerar a sobreposição com terras indígenas (Funai) e unidades de
   conservação (CNUC/MMA); `car_quality()` e `car_quality_summary()` trazem as parcelas e os nomes.
 * `car_quality()` e `car_quality_summary()`: indicadores de qualidade do cadastro, por imóvel e por

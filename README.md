@@ -64,6 +64,7 @@ car_tbl("PE") |>
 | `car_property()` | Um imóvel pelo código |
 | `car_check()` | Verificação de uma lista de códigos de uma vez |
 | `car_at()` | Imóveis que contêm um ponto |
+| `car_typology()`, `car_typology_groups()` | Tipologia dos municípios em cinco grupos |
 | `car_quality()`, `car_quality_summary()` | Indicadores de qualidade: sobreposição e área fora do município |
 | `car_tbl()` | Tabela preguiçosa para consultas com `dplyr` |
 | `car_cite()` | Como citar os dados |

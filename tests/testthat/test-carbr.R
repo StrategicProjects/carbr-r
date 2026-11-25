@@ -236,3 +236,17 @@ test_that("the check flags indigenous lands and strict protection units", {
   expect_match(out$note[4], "(APA: APA Teste), em toda a", fixed = TRUE)
   expect_equal(out$protected_area, c(NA, "Terra Teste", "Parque Teste", "APA Teste"))
 })
+
+test_that("the typology comes per municipality, with its groups", {
+  skip_if_not_installed("sf")
+  release_teste()
+  t <- car_typology()
+  expect_equal(t$municipality, c("Petrolina", "Recife"))
+  expect_equal(t$typology, c("overlapping", "few"))
+  expect_equal(t$overlap_share[1], 0.5)
+  expect_type(t$properties, "integer")
+  expect_equal(nrow(car_typology("PE")), 2)
+  groups <- car_typology_groups()
+  expect_equal(groups$typology, c("overlapping", "few"))
+  expect_equal(groups$municipalities, c(1L, 1L))
+})

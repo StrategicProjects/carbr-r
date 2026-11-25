@@ -55,6 +55,10 @@ reference:
   desc: Sobreposição entre imóveis e área fora do município declarado.
   contents:
   - car_quality
+- title: Tipologia dos municípios
+  desc: Cinco grupos de municípios, pelo perfil do cadastro.
+  contents:
+  - car_typology
 - title: Citar
   contents:
   - car_cite

@@ -711,3 +711,95 @@ car_quality_summary <- function(state = NULL) {
   names <- car_municipalities(state)[c("municipality_code", "municipality")]
   car_like(dplyr::left_join(tibble::as_tibble(out), names, by = "municipality_code"), empty)
 }
+
+#' Tipologia dos municípios
+#'
+#' Cada município entra num de cinco grupos, pelo perfil do seu cadastro: o
+#' porte dos imóveis, em que etapa a análise está e quanto os cadastros se
+#' sobrepõem. Os grupos são achados por agrupamento (k-médias) sobre sete
+#' indicadores e ficam fixos de uma atualização para a outra, de modo que dá
+#' para acompanhar um município mudando de grupo. Municípios com menos de 30
+#' imóveis não cancelados ficam em `"few"`.
+#'
+#' Os indicadores, todos sobre os imóveis não cancelados do município:
+#'
+#' * `small_share`: parcela de imóveis pequenos (até 4 módulos fiscais);
+#' * `large_area_share`: parcela da área declarada que está em imóveis
+#'   grandes;
+#' * `waiting_share`, `notified_share` e `analysed_share`: parcela aguardando
+#'   análise, notificada sem resposta e já analisada ou em análise;
+#' * `overlap_share`: parcela com mais da metade da área sobreposta a outros
+#'   cadastros;
+#' * `coverage`: área declarada dividida pela área do município (limitada
+#'   a 2).
+#'
+#' @param state Sigla de uma ou mais UFs; `NULL` (padrão) traz o país inteiro.
+#' @returns `car_typology()`: um tibble com uma linha por município: `state`,
+#'   `municipality_code`, `municipality`, `typology` (o código do grupo),
+#'   `typology_label` (o nome), `properties` e os sete indicadores.
+#'   `car_typology_groups()`: um tibble com uma linha por grupo: `typology`,
+#'   `typology_label`, `description` (o que o distingue), `municipalities` e
+#'   `properties` (quantos municípios e imóveis estão nele na publicação
+#'   atual).
+#' @examplesIf interactive()
+#' car_typology("PE")
+#' car_typology_groups()
+#' @export
+car_typology <- function(state = NULL) {
+  empty <- tibble::tibble(
+    state = character(), municipality_code = integer(), municipality = character(),
+    typology = character(), typology_label = character(), properties = integer(),
+    small_share = double(), large_area_share = double(), waiting_share = double(),
+    notified_share = double(), analysed_share = double(), overlap_share = double(),
+    coverage = double()
+  )
+  cat <- car_catalog_json()
+  if (is.null(cat)) {
+    return(empty)
+  }
+  state <- car_check_state(state, names(cat$states))
+  path <- "typology/municipalities.parquet"
+  listed <- function(cat) path %in% vapply(cat$files, function(f) f$path, character(1))
+  if (!listed(cat)) {
+    cat <- car_catalog_json(refresh = TRUE)
+    if (is.null(cat) || !listed(cat)) {
+      cli::cli_warn(
+        c("!" = "This publication has no typology.", "i" = "Returning an empty result."),
+        class = "carbr_error_http"
+      )
+      return(empty)
+    }
+  }
+  file <- car_cached_file(cat, path)
+  if (is.null(file)) {
+    return(empty)
+  }
+  con <- car_con()
+  out <- DBI::dbGetQuery(con, paste0(
+    "SELECT * FROM read_parquet(", DBI::dbQuoteString(con, file), ") ORDER BY municipality_code"
+  ))
+  out$properties <- as.integer(out$properties)
+  out <- car_like(out, empty)
+  out[out$state %in% state, ]
+}
+
+#' @rdname car_typology
+#' @export
+car_typology_groups <- function() {
+  empty <- tibble::tibble(
+    typology = character(), typology_label = character(), description = character(),
+    municipalities = integer(), properties = integer()
+  )
+  cat <- car_catalog_json()
+  groups <- cat$typology$groups
+  if (is.null(groups) || length(groups) == 0) {
+    return(empty)
+  }
+  tibble::tibble(
+    typology = vapply(groups, function(g) g$code, character(1)),
+    typology_label = vapply(groups, function(g) g$label, character(1)),
+    description = vapply(groups, function(g) g$description, character(1)),
+    municipalities = vapply(groups, function(g) as.integer(g$municipalities), integer(1)),
+    properties = vapply(groups, function(g) as.integer(g$properties), integer(1))
+  )
+}

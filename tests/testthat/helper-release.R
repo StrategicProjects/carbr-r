@@ -103,11 +103,25 @@ release_teste <- function(env = parent.frame()) {
             sum(p.area_ha * sustainable_use_share) AS sustainable_use_ha
           FROM quality q JOIN props p USING (property_code) GROUP BY ALL) TO '%s' (FORMAT parquet)", f_qm
   ))
+  dir.create(file.path(dir, "typology"))
+  f_typ <- file.path(dir, "typology", "municipalities.parquet")
+  DBI::dbExecute(con, sprintf(
+    "COPY (SELECT * FROM (VALUES
+            ('PE', 2611101, 'Petrolina', 'overlapping', 'Muita sobreposicao', 4, 0.75, 0.9, 0.75, 0.0, 0.25, 0.5, 0.4),
+            ('PE', 2611606, 'Recife', 'few', 'Poucos cadastros', 1, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.01))
+          t(state, municipality_code, municipality, typology, typology_label, properties, small_share,
+            large_area_share, waiting_share, notified_share, analysed_share, overlap_share, coverage))
+     TO '%s' (FORMAT parquet)", f_typ
+  ))
   sha <- function(f) paste(unclass(openssl::sha256(file(f))), collapse = "")
   jsonlite::write_json(
     list(
       version = "2026-01-01",
       source = list(name = "teste"),
+      typology = list(of = "2026-01-01", groups = list(
+        list(code = "overlapping", label = "Muita sobreposicao", description = "Teste.", municipalities = 1, properties = 4),
+        list(code = "few", label = "Poucos cadastros", description = "Teste.", municipalities = 1, properties = 1)
+      )),
       states = list(PE = list(
         properties = 6L, municipalities = 2L,
         quality = list(invalid_geometries = 0L, null_geometries = 0L, registered_in_other_state = 0L)
@@ -117,7 +131,8 @@ release_teste <- function(env = parent.frame()) {
         list(path = "municipalities/state=PE.parquet", sha256 = sha(f_mun)),
         list(path = "summary/state=PE.parquet", sha256 = sha(f_sum)),
         list(path = "quality/state=PE.parquet", sha256 = sha(f_q)),
-        list(path = "quality-municipalities/state=PE.parquet", sha256 = sha(f_qm))
+        list(path = "quality-municipalities/state=PE.parquet", sha256 = sha(f_qm)),
+        list(path = "typology/municipalities.parquet", sha256 = sha(f_typ))
       )
     ),
     file.path(dir, "catalog.json"),
