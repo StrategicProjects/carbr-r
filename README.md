@@ -54,6 +54,12 @@ car_tbl("PE") |>
 | `car_tbl()` | Tabela preguiçosa para consultas com `dplyr` |
 | `car_cite()` | Como citar os dados |
 
+## Guias
+
+- [Primeiros passos](https://strategicprojects.github.io/carbr-r/articles/carbr.html)
+- [Inconsistências do cadastro](https://strategicprojects.github.io/carbr-r/articles/inconsistencias.html): sobreposições, imóveis fora do município, área declarada maior que o território.
+- [Onde a análise está parada](https://strategicprojects.github.io/carbr-r/articles/analise.html): as etapas da análise por UF e quem aguarda resposta à notificação.
+
 ## Os dados
 
 - **Origem:** serviço público do Sicar, do Serviço Florestal Brasileiro. O cadastro é
