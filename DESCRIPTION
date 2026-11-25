@@ -12,6 +12,9 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-6315-8305")),
     person("Diogo", "Bezerra", email = "diogo.bezerra@ufpe.br", role = "aut",
            comment = c(ORCID = "0000-0002-1216-8674")),
+    person("Júlia", "Nascimento Barreto",
+           email = "juliabarreto@gd.seplag.pe.gov.br", role = "aut",
+           comment = c(ORCID = "0009-0004-2851-7770")),
     person("Hortênsia", "Nunes Braz de Oliveira",
            email = "hortensia.nunes@condepefidem.pe.gov.br", role = "aut",
            comment = c(ORCID = "0009-0002-3638-7211"))
