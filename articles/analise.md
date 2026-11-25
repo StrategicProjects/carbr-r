@@ -47,11 +47,11 @@ national
 #> # A tibble: 6 × 3
 #>   stage                        properties share
 #>   <fct>                             <int> <dbl>
-#> 1 Aguardando análise              5978543  69.7
-#> 2 Em análise                       109335   1.3
-#> 3 Notificado, sem resposta        1309315  15.3
+#> 1 Aguardando análise              5978517  69.7
+#> 2 Em análise                       109355   1.3
+#> 3 Notificado, sem resposta        1309319  15.3
 #> 4 Respondeu, aguarda reanálise     134338   1.6
-#> 5 Analisado                        874463  10.2
+#> 5 Analisado                        874465  10.2
 #> 6 Cancelado                        172067   2
 ```
 
@@ -142,7 +142,7 @@ waiting
 #>   <chr>           <int> <dbl>
 #> 1 large           27771   2.1
 #> 2 medium          86308   6.6
-#> 3 small         1195236  91.3
+#> 3 small         1195240  91.3
 ```
 
 91,3% são imóveis de até quatro módulos fiscais. É o público que menos
@@ -248,3 +248,122 @@ plot of chunk para
 atendimento ao produtor rende mais: municípios com muitos imóveis já
 analisados à espera de uma resposta que depende só de o declarante
 entender o que foi pedido.
+
+## Uma tipologia dos municípios
+
+As etapas da análise, o porte dos imóveis e a sobreposição entre
+cadastros variam juntos, e os municípios se parecem em blocos.
+[`car_typology()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
+resume isso: cada município entra num de cinco grupos, achados por
+agrupamento (k-médias) sobre sete indicadores do cadastro. Os grupos
+ficam fixos de uma atualização para a outra, de modo que dá para
+acompanhar um município mudando de grupo.
+
+``` r
+
+car_typology_groups() |>
+  select(typology_label, municipalities, properties, description)
+#> # A tibble: 6 × 4
+#>   typology_label                       municipalities properties
+#>   <chr>                                         <int>      <int>
+#> 1 Pequenos imóveis à espera de análise           2419    4120960
+#> 2 Análise avançada                                976    1047289
+#> 3 Grandes imóveis à espera de análise             804     735672
+#> 4 Notificados sem resposta                        732    1346341
+#> 5 Muita sobreposição                              588    1154936
+#> 6 Poucos cadastros                                 44        592
+#>   description                                                                   
+#>   <chr>                                                                         
+#> 1 Quase só imóveis pequenos, e a grande maioria ainda aguarda a análise.        
+#> 2 Boa parte dos cadastros já foi analisada ou está em análise.                  
+#> 3 A maior parte da área declarada está em imóveis grandes, e a análise mal come…
+#> 4 A análise andou, mas a maioria dos cadastros espera a resposta do declarante. 
+#> 5 Mais da metade dos imóveis tem a maior parte da área dentro de outros cadastr…
+#> 6 Menos de 30 imóveis não cancelados: pouco para caracterizar o município.
+```
+
+O perfil médio de cada grupo mostra de onde vêm os nomes:
+
+``` r
+
+typology <- car_typology()
+
+typology |>
+  group_by(typology_label) |>
+  summarise(across(small_share:coverage, \(x) round(mean(x, na.rm = TRUE), 2))) |>
+  as.data.frame()
+#>                         typology_label small_share large_area_share
+#> 1                     Análise avançada        0.90             0.28
+#> 2  Grandes imóveis à espera de análise        0.73             0.56
+#> 3                   Muita sobreposição        0.94             0.33
+#> 4             Notificados sem resposta        0.95             0.23
+#> 5 Pequenos imóveis à espera de análise        0.96             0.13
+#> 6                     Poucos cadastros        0.71             0.37
+#>   waiting_share notified_share analysed_share overlap_share coverage
+#> 1          0.31           0.19           0.50          0.14     0.91
+#> 2          0.67           0.19           0.14          0.21     0.95
+#> 3          0.85           0.08           0.07          0.55     1.11
+#> 4          0.21           0.57           0.22          0.33     0.81
+#> 5          0.92           0.04           0.04          0.18     0.83
+#> 6          0.53           0.22           0.26          0.07     0.23
+```
+
+``` r
+
+groups <- c(
+  "Pequenos imóveis à espera de análise" = "#adb5bd",
+  "Grandes imóveis à espera de análise" = "#4c6ef5",
+  "Análise avançada" = "#37b24d",
+  "Notificados sem resposta" = "#f76707",
+  "Muita sobreposição" = "#c2255c",
+  "Poucos cadastros" = "#f1f3f5"
+)
+
+brazil <- sf::read_sf(paste0(
+  "https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?intrarregiao=municipio",
+  "&formato=application/vnd.geo%2Bjson&qualidade=minima"
+)) |>
+  mutate(municipality_code = as.integer(codarea)) |>
+  left_join(typology, by = "municipality_code") |>
+  mutate(typology_label = factor(typology_label, names(groups)))
+
+ggplot(brazil) +
+  geom_sf(aes(fill = typology_label), colour = NA) +
+  scale_fill_manual(values = groups, na.value = "#f1f3f5", na.translate = FALSE, name = NULL) +
+  labs(
+    title = "Tipologia dos municípios pelo perfil do CAR",
+    caption = "Fontes: SFB/Sicar, via carbr; malha municipal do IBGE."
+  ) +
+  guides(fill = guide_legend(ncol = 2)) +
+  theme_void() +
+  theme(legend.position = "bottom", plot.title = element_text(face = "bold"))
+```
+
+![Mapa do Brasil com os municípios coloridos pelo grupo da
+tipologia.](analise-tipologia-1.png)
+
+plot of chunk tipologia
+
+O mapa separa situações que pedem respostas diferentes. Onde a análise
+mal começou, o gargalo é a capacidade do órgão ambiental. Onde os
+cadastros estão notificados e sem resposta, é o atendimento ao
+declarante. Onde a sobreposição domina, é a qualidade do que foi
+declarado. E um estado pode ter mais de uma dessas situações:
+
+``` r
+
+typology |>
+  count(state, typology_label) |>
+  group_by(state) |>
+  slice_max(n, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  count(typology_label, name = "states")
+#> # A tibble: 5 × 2
+#>   typology_label                       states
+#>   <chr>                                 <int>
+#> 1 Análise avançada                          3
+#> 2 Grandes imóveis à espera de análise       5
+#> 3 Muita sobreposição                        3
+#> 4 Notificados sem resposta                  6
+#> 5 Pequenos imóveis à espera de análise     10
+```

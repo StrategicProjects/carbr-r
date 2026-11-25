@@ -203,6 +203,138 @@ quality |>
 desce ao imóvel. Mais adiante, este guia refaz a conta de um município
 passo a passo, para mostrar de onde os números vêm.
 
+## Terras indígenas e unidades de conservação
+
+O mesmo resumo traz quantos imóveis têm mais de 1% da área dentro de uma
+terra indígena (camada da Funai, em todas as fases do processo) ou de
+uma unidade de conservação (Cadastro Nacional de Unidades de
+Conservação, do MMA). Nas unidades de conservação o grupo importa: as de
+proteção integral, como parques e estações ecológicas, em regra não
+admitem imóveis privados; as de uso sustentável incluem as áreas de
+proteção ambiental (APA) e as reservas particulares (RPPN), onde a
+propriedade privada é normal.
+
+``` r
+
+protected <- quality |>
+  group_by(state) |>
+  summarise(
+    properties = sum(properties),
+    indigenous = sum(indigenous),
+    strict_protection = sum(strict_protection),
+    sustainable_use = sum(sustainable_use)
+  )
+
+protected |>
+  summarise(across(-state, sum))
+#> # A tibble: 1 × 4
+#>   properties indigenous strict_protection sustainable_use
+#>        <int>      <int>             <int>           <int>
+#> 1    8405790      13528             67009          554124
+```
+
+``` r
+
+protected |>
+  tidyr::pivot_longer(c(indigenous, strict_protection), names_to = "kind", values_to = "n") |>
+  mutate(
+    kind = c(indigenous = "Terra indígena", strict_protection = "Proteção integral")[kind],
+    state = reorder(state, n, sum)
+  ) |>
+  ggplot(aes(n, state, fill = kind)) +
+  geom_col() +
+  scale_fill_manual(values = c("Terra indígena" = "#c2255c", "Proteção integral" = "#2b8a3e"), name = NULL) +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ".", decimal.mark = ",")) +
+  labs(
+    title = "Imóveis do CAR sobre terra indígena ou unidade de proteção integral",
+    subtitle = "Imóveis não cancelados com mais de 1% da área dentro dessas áreas",
+    x = NULL, y = NULL,
+    caption = "Fontes: SFB/Sicar, via carbr; Funai; CNUC/MMA."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom", plot.title = element_text(face = "bold"))
+```
+
+![Barras horizontais com o número de imóveis de cada UF em terra
+indígena e em unidade de conservação de proteção
+integral.](inconsistencias-protegidas-1.png)
+
+plot of chunk protegidas
+
+Os municípios com mais casos, em cada tipo:
+
+``` r
+
+quality |>
+  arrange(desc(indigenous)) |>
+  select(state, municipality, properties, indigenous, indigenous_ha)
+#> # A tibble: 5,563 × 5
+#>   state municipality        properties indigenous indigenous_ha
+#>   <chr> <chr>                    <int>      <int>         <dbl>
+#> 1 BA    Abaré                     2167       1114         9997.
+#> 2 MA    Fernando Falcão           1291        658       640981.
+#> 3 AL    Palmeira dos Índios       5745        481         4111.
+#> 4 MG    Itacarambi                2458        448        26549.
+#> 5 MA    Grajaú                    5508        370       106598.
+#> 6 AM    Manicoré                  2541        345      2940910.
+#> # ℹ 5,557 more rows
+
+quality |>
+  arrange(desc(strict_protection)) |>
+  select(state, municipality, properties, strict_protection, strict_protection_ha)
+#> # A tibble: 5,563 × 5
+#>   state municipality  properties strict_protection strict_protection_ha
+#>   <chr> <chr>              <int>             <int>                <dbl>
+#> 1 MG    Januária           12397              2377              263163.
+#> 2 RO    Porto Velho        23819              1773              359216.
+#> 3 MG    Itamonte            1854              1384               29674.
+#> 4 AM    Canutama            2883              1313              685991.
+#> 5 RJ    Nova Friburgo       3577              1287               32540.
+#> 6 BA    Sento Sé            6649               895              157951.
+#> # ℹ 5,557 more rows
+```
+
+Por imóvel,
+[`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+traz a parcela da área e o nome da terra indígena ou da unidade de
+conservação. É o que
+[`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md)
+usa na triagem: um cadastro ativo passa de `"ok"` a `"attention"` quando
+mais de 1% da área está em terra indígena ou em unidade de proteção
+integral, e a nota diz qual.
+
+``` r
+
+aguas_belas <- car_quality("PE", municipality = "Águas Belas")
+
+aguas_belas |>
+  filter(indigenous_share > 0.5) |>
+  select(property_code, indigenous_share, indigenous_land) |>
+  head(3)
+#> # A tibble: 3 × 3
+#>   property_code                               indigenous_share indigenous_land
+#>   <chr>                                                  <dbl> <chr>          
+#> 1 PE-2600500-385FDF5753EB45ACBB8541F300FB68F6                1 Fulni-ô        
+#> 2 PE-2600500-4D7A545AB67940E78FA69D3E278F9B6D                1 Fulni-ô        
+#> 3 PE-2600500-5244FB34CF6E4D38BD3F2D57D4DFD337                1 Fulni-ô
+
+car_check(head(aguas_belas$property_code[aguas_belas$indigenous_share > 0.5], 2)) |>
+  select(check, note)
+#> # A tibble: 2 × 2
+#>   check    
+#>   <chr>    
+#> 1 attention
+#> 2 attention
+#>   note                                                                          
+#>   <chr>                                                                         
+#> 1 Analisado, com notificação sem resposta do declarante. Sobrepõe terra indígen…
+#> 2 Analisado, com notificação sem resposta do declarante. Sobrepõe terra indígen…
+```
+
+O sinal vem de perímetros autodeclarados cruzados com limites oficiais,
+e não é uma conclusão sobre o imóvel: há terras indígenas ainda em
+estudo, e cadastros anteriores à criação de uma unidade de conservação.
+
 ## O código diz um município, o cadastro diz outro
 
 O código do imóvel traz o município em que ele foi registrado
@@ -434,8 +566,8 @@ car_tbl("PE") |>
 #> # A tibble: 3 × 3
 #>   property_type         properties area_ha
 #>   <chr>                      <dbl>   <dbl>
-#> 1 rural_property                 1    926.
-#> 2 settlement                   432 651693.
+#> 1 settlement                   432 651693.
+#> 2 rural_property                 1    926.
 #> 3 traditional_community         65 164138.
 ```
 
