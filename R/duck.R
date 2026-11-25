@@ -12,7 +12,12 @@ car_con <- function() {
   con
 }
 
-#' Remote files need DuckDB's `httpfs` extension, installed on first use
+#' Remote files need DuckDB's `httpfs` extension
+#'
+#' DuckDB loads the extension by itself once it is installed, but does not
+#' install it: that is done here, on the first remote read, with a message.
+#' The extension is the official one (MIT), fetched by DuckDB from its own
+#' repository into DuckDB's extension folder, as `INSTALL httpfs` does.
 #' @noRd
 car_need_httpfs <- function(con, error_call = rlang::caller_env()) {
   if (isTRUE(car_env$httpfs)) {
@@ -20,25 +25,24 @@ car_need_httpfs <- function(con, error_call = rlang::caller_env()) {
   }
   ok <- tryCatch(
     {
+      installed <- DBI::dbGetQuery(
+        con, "SELECT installed FROM duckdb_extensions() WHERE extension_name = 'httpfs'"
+      )$installed
+      if (!isTRUE(installed)) {
+        car_inform(c("i" = "Installing DuckDB's {.pkg httpfs} extension (once), to read remote files."))
+        DBI::dbExecute(con, "INSTALL httpfs")
+      }
       DBI::dbExecute(con, "LOAD httpfs")
       TRUE
     },
-    error = function(cnd) {
-      tryCatch(
-        {
-          DBI::dbExecute(con, "INSTALL httpfs")
-          DBI::dbExecute(con, "LOAD httpfs")
-          TRUE
-        },
-        error = function(cnd) FALSE
-      )
-    }
+    error = function(cnd) FALSE
   )
   if (!ok) {
     cli::cli_abort(
       c(
         "DuckDB's {.pkg httpfs} extension could not be loaded.",
-        "i" = "It is downloaded once from the DuckDB extension repository."
+        "i" = "It is downloaded once from the DuckDB extension repository;
+               check the internet connection and try again."
       ),
       class = "carbr_error_config",
       call = error_call

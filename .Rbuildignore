@@ -9,3 +9,5 @@
 ^pkgdown$
 ^vignettes/.*\.Rmd\.orig$
 ^vignettes/precompile\.R$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
