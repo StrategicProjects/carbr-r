@@ -1,0 +1,57 @@
+url: https://strategicprojects.github.io/carbr-r/
+lang: pt
+
+template:
+  bootstrap: 5
+  light-switch: true
+  bslib:
+    primary: "#1f5f3a"
+
+navbar:
+  structure:
+    left:  [intro, reference, news]
+    right: [search, github, lightswitch]
+  components:
+    intro:
+      text: Primeiros passos
+      href: articles/carbr.html
+    reference:
+      text: Funções
+      href: reference/index.html
+    news:
+      text: Novidades
+      href: news/index.html
+
+home:
+  title: "carbr: o Cadastro Ambiental Rural no R"
+  description: >
+    Os imóveis rurais declarados no Cadastro Ambiental Rural (CAR), lidos de
+    uma republicação em GeoParquet: consultas por UF, município, situação,
+    porte, retângulo, ponto ou código, sem baixar a base inteira.
+
+reference:
+- title: Descobrir
+  desc: O que está publicado e o que cada coluna significa.
+  contents:
+  - car_catalog
+  - car_dictionary
+  - car_municipalities
+- title: Obter os imóveis
+  contents:
+  - car_properties
+  - car_property
+  - car_at
+  - car_tbl
+- title: Citar
+  contents:
+  - car_cite
+- title: Cache e opções
+  contents:
+  - car_cache_dir
+  - carbr-package
+
+articles:
+- title: Guias
+  navbar: ~
+  contents:
+  - carbr

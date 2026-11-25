@@ -1,0 +1,59 @@
+Package: carbr
+Title: Access the Rural Environmental Registry of Brazil ('CAR')
+Version: 0.0.0.9000
+Authors@R: c(
+    person("André", "Leite", email = "leite@castlab.org", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-4718-9766")),
+    person("Marcos", "Wasiliew", email = "marcos.wasiliew@gmail.com", role = "aut",
+           comment = c(ORCID = "0009-0004-4694-3159")),
+    person("Hugo", "Vasconcelos", email = "hugo.vasconcelos@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0001-6249-0920")),
+    person("Carlos", "Amorim", email = "carlos.agaf@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0001-6315-8305")),
+    person("Diogo", "Bezerra", email = "diogo.bezerra@ufpe.br", role = "aut",
+           comment = c(ORCID = "0000-0002-1216-8674"))
+  )
+Description: A tidy interface to the rural properties declared in the
+    Rural Environmental Registry of Brazil ('Cadastro Ambiental Rural',
+    'CAR'), republished from the public service of the national system
+    ('Sicar') as cloud-optimised 'GeoParquet'. Queries by state,
+    municipality, status, size, bounding box, point or property code read
+    only the parts of the remote files they need, so no full download of
+    the registry is required. Results are returned as tibbles or 'sf'
+    objects. Small files are cached on disk per catalogue version and
+    checked against their published 'SHA-256'. Network failures are
+    handled gracefully.
+License: MIT + file LICENSE
+URL: https://github.com/StrategicProjects/carbr-r,
+    https://strategicprojects.github.io/carbr-r/
+BugReports: https://github.com/StrategicProjects/carbr-r/issues
+Depends:
+    R (>= 4.1)
+Imports:
+    cli,
+    DBI,
+    dbplyr,
+    dplyr,
+    duckdb (>= 1.1.0),
+    httr2 (>= 1.0.0),
+    jsonlite,
+    openssl,
+    rlang (>= 1.1.0),
+    tibble,
+    tools
+Suggests:
+    blob,
+    ggplot2,
+    knitr,
+    rmarkdown,
+    sf,
+    testthat (>= 3.0.0),
+    withr
+VignetteBuilder:
+    knitr
+Config/testthat/edition: 3
+Config/Needs/website: pkgdown
+Encoding: UTF-8
+Language: pt-BR
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.0.0

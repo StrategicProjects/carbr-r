@@ -1,0 +1,11 @@
+^_pkgdown\.yml$
+^.*\.Rcheck$
+^.*\.Rproj$
+^\.claude$
+^\.github$
+^\.Rproj\.user$
+^docs$
+^LICENSE\.md$
+^pkgdown$
+^vignettes/.*\.Rmd\.orig$
+^vignettes/precompile\.R$

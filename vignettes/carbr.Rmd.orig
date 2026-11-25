@@ -1,0 +1,163 @@
+---
+title: "Primeiros passos"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Primeiros passos}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4.6,
+  fig.path = "carbr-", dpi = 96, fig.align = "center"
+)
+options(carbr.quiet = TRUE, tibble.print_min = 6, tibble.width = 90)
+```
+
+O **Cadastro Ambiental Rural (CAR)** é o registro público eletrônico dos
+imóveis rurais do país, criado pelo Código Florestal (Lei nº 12.651/2012) e
+mantido no Sicar pelo Serviço Florestal Brasileiro. O `carbr` lê uma
+republicação dos dados públicos do cadastro em GeoParquet: cada consulta
+transfere só os trechos do arquivo de que precisa, sem baixar a base de um
+estado inteiro e sem passar pelos servidores do Sicar.
+
+| Função | Para quê |
+|---|---|
+| `car_catalog()` | O que está publicado |
+| `car_dictionary()` | O que cada coluna significa |
+| `car_municipalities()` | Resumo por município |
+| `car_properties()` | Imóveis de uma UF, com filtros |
+| `car_property()` | Um imóvel pelo código |
+| `car_at()` | Imóveis que contêm um ponto |
+| `car_tbl()` | Tabela preguiçosa para o `dplyr` |
+| `car_cite()` | Como citar |
+
+```{r setup, message = FALSE}
+library(carbr)
+library(dplyr)
+library(ggplot2)
+```
+
+## O que está publicado
+
+`car_catalog()` traz uma linha por UF, com o número de imóveis e os
+indicadores de qualidade da carga. A versão é a data em que os dados foram
+lidos do Sicar.
+
+```{r}
+cat <- car_catalog()
+cat
+attr(cat, "version")
+```
+
+O dicionário de dados diz o que é cada coluna e qual era o seu nome no Sicar.
+
+```{r}
+car_dictionary() |> print(n = 22)
+```
+
+## Resumo por município
+
+Para contagens, não é preciso ler os imóveis: o resumo municipal é um
+arquivo pequeno, guardado em cache.
+
+```{r}
+car_municipalities("PE") |>
+  arrange(desc(properties)) |>
+  select(municipality, properties, small_properties, area_ha, pending)
+```
+
+## Imóveis de um município
+
+Os filtros de `car_properties()` são aplicados antes da leitura. Aqui, os
+imóveis médios e grandes de Petrolina — algumas centenas, de um arquivo com
+mais de 400 mil. Com o pacote `sf` instalado, o resultado é um objeto `sf`
+em SIRGAS 2000.
+
+```{r}
+petrolina <- car_properties(
+  "PE",
+  municipality = "Petrolina",
+  size_class = c("medium", "large")
+)
+petrolina |> select(property_code, status, area_ha, fiscal_modules, size_class)
+```
+
+```{r petrolina, fig.alt = "Mapa dos imóveis médios e grandes declarados no CAR em Petrolina."}
+ggplot(petrolina) +
+  geom_sf(aes(fill = size_class), colour = "white", linewidth = 0.1, alpha = 0.8) +
+  scale_fill_manual(
+    values = c(medium = "#8fbf9f", large = "#1f5f3a"),
+    breaks = c("medium", "large"),
+    labels = c(medium = "Médio (4 a 15 módulos fiscais)", large = "Grande (acima de 15)"),
+    name = NULL
+  ) +
+  labs(
+    title = "Imóveis médios e grandes no CAR",
+    subtitle = "Petrolina, Pernambuco",
+    caption = "Fonte: SFB/Sicar, via carbr. Cadastro autodeclarado, com sobreposições."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom", axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+O município pode ser dado pelo nome (sem diferenciar maiúsculas nem acentos)
+ou pelo código IBGE de sete dígitos. Os outros filtros são `status`,
+`property_type` e `bbox`.
+
+## Sem a geometria
+
+A geometria é a parte pesada do arquivo. Quando só os atributos interessam,
+`geometry = FALSE` deixa de transferi-la. Os cadastros pendentes de
+Pernambuco, por município:
+
+```{r}
+pending <- car_properties("PE", status = "pending", geometry = FALSE)
+pending |> count(municipality, sort = TRUE)
+```
+
+## Que imóveis estão declarados aqui?
+
+`car_at()` devolve os imóveis que contêm um ponto. Como o cadastro é
+autodeclarado, sobreposições são comuns e o resultado pode ter mais de uma
+linha.
+
+```{r}
+car_at(lon = -40.5, lat = -9.2) |>
+  sf::st_drop_geometry() |>
+  select(property_code, municipality, area_ha, status, condition)
+```
+
+## Um imóvel pelo código
+
+```{r}
+car_property("PE-2611101-588BC484570D440484F527F07DF5AFFA", geometry = FALSE) |>
+  glimpse()
+```
+
+## Consultas próprias
+
+`car_tbl()` devolve uma tabela preguiçosa do `dplyr` sobre os arquivos
+publicados. Nada é lido até o `collect()`, e a agregação roda sobre o
+arquivo remoto lendo só as colunas usadas.
+
+```{r}
+car_tbl("PE") |>
+  group_by(size_class) |>
+  summarise(properties = n(), area_ha = sum(area_ha, na.rm = TRUE)) |>
+  collect()
+```
+
+## Como citar
+
+```{r}
+car_cite()
+```
+
+## Endereço dos dados e cache
+
+O pacote lê de um bucket público. Para usar um espelho compatível com S3 ou
+uma cópia local da publicação, defina `options(carbr.base_url = )` ou a
+variável de ambiente `CAR_URL`. O catálogo e o resumo municipal ficam em
+cache em `car_cache_dir()`; os imóveis nunca são copiados para o disco.
