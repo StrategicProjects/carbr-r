@@ -12,27 +12,40 @@ car_con <- function() {
   con
 }
 
-#' Remote files need DuckDB's `httpfs` extension
-#'
-#' DuckDB loads the extension by itself once it is installed, but does not
-#' install it: that is done here, on the first remote read, with a message.
-#' The extension is the official one (MIT), fetched by DuckDB from its own
-#' repository into DuckDB's extension folder, as `INSTALL httpfs` does.
+#' Is DuckDB's `httpfs` extension installed?
 #' @noRd
-car_need_httpfs <- function(con, error_call = rlang::caller_env()) {
-  if (isTRUE(car_env$httpfs)) {
+car_httpfs_installed <- function(con) {
+  isTRUE(DBI::dbGetQuery(
+    con, "SELECT installed FROM duckdb_extensions() WHERE extension_name = 'httpfs'"
+  )$installed)
+}
+
+#' Instalar a extensão `httpfs` do DuckDB
+#'
+#' Para ler só os trechos necessários dos arquivos remotos, o `carbr` usa o
+#' DuckDB com a extensão oficial `httpfs` (código aberto, licença MIT). O
+#' DuckDB a baixa do seu próprio repositório de extensões para a pasta de
+#' extensões dele, fora das pastas do `carbr`; por isso a instalação só é
+#' feita com a sua confirmação.
+#'
+#' Em sessão interativa, o pacote pergunta na primeira leitura remota. Em
+#' scripts, relatórios e automações, chame `car_install_httpfs()` uma vez
+#' (a instalação fica guardada para as próximas sessões) ou defina
+#' `options(carbr.install_httpfs = TRUE)`.
+#'
+#' @returns `TRUE`, invisível, se a extensão está instalada ao final.
+#' @examplesIf interactive()
+#' car_install_httpfs()
+#' @export
+car_install_httpfs <- function() {
+  con <- car_con()
+  if (car_httpfs_installed(con)) {
+    car_inform(c("v" = "DuckDB's {.pkg httpfs} extension is already installed."))
     return(invisible(TRUE))
   }
   ok <- tryCatch(
     {
-      installed <- DBI::dbGetQuery(
-        con, "SELECT installed FROM duckdb_extensions() WHERE extension_name = 'httpfs'"
-      )$installed
-      if (!isTRUE(installed)) {
-        car_inform(c("i" = "Installing DuckDB's {.pkg httpfs} extension (once), to read remote files."))
-        DBI::dbExecute(con, "INSTALL httpfs")
-      }
-      DBI::dbExecute(con, "LOAD httpfs")
+      DBI::dbExecute(con, "INSTALL httpfs")
       TRUE
     },
     error = function(cnd) FALSE
@@ -40,11 +53,61 @@ car_need_httpfs <- function(con, error_call = rlang::caller_env()) {
   if (!ok) {
     cli::cli_abort(
       c(
-        "DuckDB's {.pkg httpfs} extension could not be loaded.",
-        "i" = "It is downloaded once from the DuckDB extension repository;
+        "DuckDB's {.pkg httpfs} extension could not be installed.",
+        "i" = "It is downloaded from the DuckDB extension repository;
                check the internet connection and try again."
       ),
-      class = "carbr_error_config",
+      class = "carbr_error_httpfs"
+    )
+  }
+  car_inform(c("v" = "Installed DuckDB's {.pkg httpfs} extension."))
+  invisible(TRUE)
+}
+
+#' Remote files need DuckDB's `httpfs` extension
+#'
+#' DuckDB loads the extension by itself once it is installed, but does not
+#' install it, and neither does this package without the user's consent:
+#' asked for in interactive sessions, given beforehand elsewhere (CRAN
+#' policy on writing outside the package's own directories).
+#' @noRd
+car_need_httpfs <- function(con, error_call = rlang::caller_env()) {
+  if (isTRUE(car_env$httpfs)) {
+    return(invisible(TRUE))
+  }
+  if (!car_httpfs_installed(con)) {
+    consent <- isTRUE(getOption("carbr.install_httpfs"))
+    if (!consent && rlang::is_interactive()) {
+      cli::cli_inform(c(
+        "i" = "Reading remote files needs DuckDB's {.pkg httpfs} extension (open source, MIT).",
+        " " = "DuckDB downloads it once from its extension repository into its own extension folder."
+      ))
+      consent <- isTRUE(utils::askYesNo("Install it now?", default = TRUE))
+    }
+    if (!consent) {
+      cli::cli_abort(
+        c(
+          "DuckDB's {.pkg httpfs} extension is needed to read remote files and is not installed.",
+          "i" = "Run {.run carbr::car_install_httpfs()} once, or set
+                 {.code options(carbr.install_httpfs = TRUE)}."
+        ),
+        class = "carbr_error_httpfs",
+        call = error_call
+      )
+    }
+    car_install_httpfs()
+  }
+  ok <- tryCatch(
+    {
+      DBI::dbExecute(con, "LOAD httpfs")
+      TRUE
+    },
+    error = function(cnd) FALSE
+  )
+  if (!ok) {
+    cli::cli_abort(
+      "DuckDB's {.pkg httpfs} extension could not be loaded.",
+      class = "carbr_error_httpfs",
       call = error_call
     )
   }

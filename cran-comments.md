@@ -22,9 +22,11 @@ submission".
   `options(carbr.base_url = )` or the `CAR_URL` environment variable.
 * Remote 'Parquet' files are read with 'duckdb' and its official 'httpfs'
   extension (MIT), which 'duckdb' downloads from its own extension
-  repository on the first remote read, announced with a message. This is
-  the same mechanism used by the CRAN package 'duckdbfs'. Nothing in the
-  examples, tests or vignettes triggers it.
+  repository into its own extension folder. The package never installs it
+  without the user's consent: in interactive sessions it asks before the
+  first remote read; elsewhere it stops with a message pointing to
+  `car_install_httpfs()` (or `options(carbr.install_httpfs = TRUE)`).
+  Nothing in the examples, tests or vignettes triggers the installation.
 * Small files (the catalogue and the precomputed summaries) are cached
   under `tools::R_user_dir("carbr", "cache")`, as required by CRAN policy,
   and can be removed with `car_cache_clear()`. Property files are never

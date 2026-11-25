@@ -53,8 +53,9 @@ reference:
 - title: Citar
   contents:
   - car_cite
-- title: Cache e opções
+- title: Instalação, cache e opções
   contents:
+  - car_install_httpfs
   - car_cache_dir
   - carbr-package
 

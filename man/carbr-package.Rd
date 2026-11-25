@@ -17,6 +17,8 @@ A tidy interface to the rural properties declared in the Rural Environmental Reg
 \code{CAR_URL}. O padrão é o bucket público; serve para apontar para um
 espelho ou para uma cópia local. A árvore tem \code{catalog.json}, \code{dictionary.json},
 \verb{municipalities/} e \verb{properties/state=<UF>/}.
+\item \code{carbr.install_httpfs}: \code{TRUE} autoriza instalar a extensão \code{httpfs} do
+DuckDB sem perguntar; ver \code{\link[=car_install_httpfs]{car_install_httpfs()}}.
 \item \code{carbr.quiet}: silencia as mensagens informativas. Padrão \code{TRUE} em
 sessões não interativas.
 \item \code{carbr.cache_dir}: local do cache. Padrão

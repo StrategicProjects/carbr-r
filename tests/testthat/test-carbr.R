@@ -141,3 +141,12 @@ test_that("a file updated in place is accepted after re-reading the catalogue", 
   unlink(file.path(cache, "2026-01-01"), recursive = TRUE)
   expect_error(car_municipalities("PE"), class = "carbr_error_integrity")
 })
+
+test_that("the httpfs extension is not installed without consent", {
+  withr::local_options(carbr.install_httpfs = NULL, rlang_interactive = FALSE)
+  local_mocked_bindings(car_httpfs_installed = function(con) FALSE)
+  old <- car_env$httpfs
+  car_env$httpfs <- FALSE
+  withr::defer(car_env$httpfs <- old)
+  expect_error(car_need_httpfs(car_con()), class = "carbr_error_httpfs")
+})

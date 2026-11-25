@@ -35,6 +35,10 @@ pelos servidores do Sicar.
 | `car_tbl()` | Tabela preguiçosa para o `dplyr` |
 | `car_cite()` | Como citar |
 
+A leitura parcial é feita pelo DuckDB com a extensão oficial `httpfs`. Na
+primeira consulta, em sessão interativa, o pacote pergunta se pode
+instalá-la; em scripts e relatórios, rode `car_install_httpfs()` uma vez.
+
 ```{r setup, message = FALSE}
 library(carbr)
 library(dplyr)

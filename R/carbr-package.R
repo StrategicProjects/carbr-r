@@ -5,6 +5,8 @@
 #'   `CAR_URL`. O padrão é o bucket público; serve para apontar para um
 #'   espelho ou para uma cópia local. A árvore tem `catalog.json`, `dictionary.json`,
 #'   `municipalities/` e `properties/state=<UF>/`.
+#' * `carbr.install_httpfs`: `TRUE` autoriza instalar a extensão `httpfs` do
+#'   DuckDB sem perguntar; ver [car_install_httpfs()].
 #' * `carbr.quiet`: silencia as mensagens informativas. Padrão `TRUE` em
 #'   sessões não interativas.
 #' * `carbr.cache_dir`: local do cache. Padrão

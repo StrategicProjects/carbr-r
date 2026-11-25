@@ -50,6 +50,7 @@ jobs:
           extra-packages: local::.
       - name: Large properties of Petrolina from the live data
         run: |
+          carbr::car_install_httpfs()
           x <- carbr::car_properties("PE", municipality = "Petrolina",
             size_class = "large", geometry = FALSE)
           stopifnot(nrow(x) > 0, all(x$municipality == "Petrolina"))
