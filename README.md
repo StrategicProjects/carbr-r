@@ -46,6 +46,7 @@ car_properties("PE", status = "pending", geometry = FALSE)
 
 car_at(lon = -40.5, lat = -9.2)     # que imóveis estão declarados neste ponto?
 car_property("PE-2611101-588BC484570D440484F527F07DF5AFFA")
+car_check(codigos)                  # triagem de uma lista de códigos
 
 # Qualquer outra consulta, com dplyr, direto no arquivo remoto
 car_tbl("PE") |>
@@ -61,6 +62,7 @@ car_tbl("PE") |>
 | `car_municipalities()` | Resumo por município |
 | `car_properties()` | Imóveis de uma UF, com filtros aplicados antes da leitura |
 | `car_property()` | Um imóvel pelo código |
+| `car_check()` | Verificação de uma lista de códigos de uma vez |
 | `car_at()` | Imóveis que contêm um ponto |
 | `car_tbl()` | Tabela preguiçosa para consultas com `dplyr` |
 | `car_cite()` | Como citar os dados |

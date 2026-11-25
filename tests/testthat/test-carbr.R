@@ -150,3 +150,43 @@ test_that("the httpfs extension is not installed without consent", {
   withr::defer(car_env$httpfs <- old)
   expect_error(car_need_httpfs(car_con()), class = "carbr_error_httpfs")
 })
+
+test_that("car_check() classifies a batch of codes, one row per code, in the given order", {
+  skip_if_not_installed("sf")
+  release_teste()
+  codes <- c(
+    sprintf("PE-2611101-%032X", 3),     # pending
+    "not a code",
+    sprintf("pe-2611606-%032X", 5),     # cancelled, lower case
+    sprintf("PE-2611606-%032X", 99),    # not in the publication
+    sprintf("PE-2611101-%032X", 1),     # active
+    sprintf("PE-2600054-%032X", 4),     # another municipality in the code
+    sprintf("SP-3550308-%032X", 1)      # a state that is not published
+  )
+  out <- car_check(c(codes, codes[1]))
+  expect_equal(nrow(out), 7)
+  expect_equal(out$property_code, toupper(codes))
+  expect_equal(out$check, c("attention", "invalid", "blocked", "not_found", "ok", "not_found", "not_found"))
+  expect_equal(out$stage[c(1, 5)], c("waiting", "waiting"))
+  expect_equal(out$area_ha[c(1, 3, 5)], c(30, 50, 10))
+  expect_true(all(is.na(out$state[c(2, 4, 6, 7)])))
+  expect_match(out$note[3], "cancelado")
+  expect_named(out, c(
+    "property_code", "check", "note", "stage", "status", "condition", "property_type",
+    "size_class", "area_ha", "fiscal_modules", "state", "municipality", "created_at"
+  ))
+  expect_equal(nrow(car_check(character())), 0)
+})
+
+test_that("the analysis stage is read from the Sicar wording", {
+  expect_equal(
+    car_stage(c(
+      "Aguardando an\u00e1lise", "Em an\u00e1lise",
+      "Analisado, aguardando atendimento a notifica\u00e7\u00e3o",
+      "Aguardando an\u00e1lise, ap\u00f3s revis\u00e3o ou atendimento da notifica\u00e7\u00e3o",
+      "Analisado, em conformidade com a Lei n\u00ba 12.651/2012",
+      "Cancelado por decis\u00e3o administrativa", NA
+    )),
+    c("waiting", "analysing", "notified", "answered", "done", "cancelled", NA)
+  )
+})

@@ -406,3 +406,104 @@ car_at <- function(lon, lat, state = NULL, geometry = TRUE) {
   }
   out
 }
+
+#' Etapa da análise a partir da situação informada pelo Sicar
+#' @noRd
+car_stage <- function(condition) {
+  dplyr::case_when(
+    is.na(condition) ~ NA_character_,
+    startsWith(condition, "Cancelado") ~ "cancelled",
+    condition == "Aguardando an\u00e1lise" ~ "waiting",
+    condition == "Em an\u00e1lise" ~ "analysing",
+    grepl("aguardando atendimento a notifica\u00e7\u00e3o", condition, fixed = TRUE) ~ "notified",
+    grepl("ap\u00f3s revis\u00e3o", condition, fixed = TRUE) ~ "answered",
+    TRUE ~ "done"
+  )
+}
+
+#' Verificar vários imóveis de uma vez
+#'
+#' Para uma lista de códigos, diz o que consta de cada um na camada pública
+#' do CAR e resume em um resultado: a triagem que antecede, por exemplo, a
+#' análise de um pedido de crédito rural. Os códigos são agrupados por UF e
+#' município, de modo que uma lista grande lê poucos trechos de cada arquivo.
+#'
+#' O resultado (`check`) é uma classificação do pacote, não uma regra
+#' oficial:
+#'
+#' * `"ok"`: cadastro ativo, sem notificação pendente;
+#' * `"attention"`: cadastro pendente, ou analisado com notificação ainda
+#'   sem resposta do declarante;
+#' * `"blocked"`: cadastro cancelado ou suspenso;
+#' * `"not_found"`: código que não está na publicação (pode ter sido
+#'   cadastrado depois da última atualização);
+#' * `"invalid"`: texto que não tem o formato de um código do CAR.
+#'
+#' A verificação diz só o que a camada pública traz. Não cobre embargos,
+#' sobreposição com terras indígenas ou unidades de conservação, nem
+#' substitui a consulta oficial ao Sicar.
+#'
+#' @param code Códigos de imóvel no CAR (`UF-0000000-identificador`).
+#' @returns Um tibble com uma linha por código, na ordem dada: `property_code`,
+#'   `check`, `note` (o motivo, em português), `stage` (a etapa da análise:
+#'   `"waiting"`, `"analysing"`, `"notified"`, `"answered"`, `"done"` ou
+#'   `"cancelled"`), `status`, `condition`, `property_type`, `size_class`,
+#'   `area_ha`, `fiscal_modules`, `state`, `municipality` e `created_at`.
+#' @examplesIf interactive()
+#' car_check(c(
+#'   "PE-2611101-588BC484570D440484F527F07DF5AFFA",
+#'   "PE-2611101-00000000000000000000000000000000"
+#' ))
+#' @export
+car_check <- function(code) {
+  code <- unique(toupper(trimws(as.character(code))))
+  code <- code[!is.na(code) & nzchar(code)]
+  valid <- grepl("^[A-Z]{2}-[0-9]{7}-[0-9A-F]{32}$", code)
+  columns <- c(
+    "property_code", "status", "condition", "property_type", "size_class",
+    "area_ha", "fiscal_modules", "state", "municipality", "created_at"
+  )
+  found <- car_empty_properties()[columns]
+  cat <- car_catalog_json()
+  if (!is.null(cat) && any(valid)) {
+    for (uf in intersect(unique(substr(code[valid], 1, 2)), names(cat$states))) {
+      wanted <- code[valid & substr(code, 1, 2) == uf]
+      tbl <- dplyr::tbl(car_con(), dbplyr::sql(paste("SELECT * FROM", car_parquet_sql(cat, uf)))) |>
+        dplyr::select(dplyr::all_of(c(columns, "municipality_code")))
+      # The code carries the municipality: that filter reads a few row groups.
+      towns <- unique(as.integer(substr(wanted, 4, 10)))
+      part <- car_collect(dplyr::filter(
+        tbl, .data$municipality_code %in% !!towns, .data$property_code %in% !!wanted
+      ))
+      left <- setdiff(wanted, part$property_code)
+      if (!is.null(part) && length(left) > 0) {
+        # A few properties sit in another municipality than the code says.
+        more <- car_collect(dplyr::filter(tbl, .data$property_code %in% !!left))
+        if (!is.null(more)) part <- rbind(part, more)
+      }
+      if (!is.null(part)) found <- rbind(found, tibble::as_tibble(part)[columns])
+    }
+  }
+  out <- dplyr::left_join(tibble::tibble(property_code = code), found, by = "property_code")
+  missing <- is.na(out$state)
+  out$stage <- car_stage(out$condition)
+  out$check <- dplyr::case_when(
+    !valid ~ "invalid",
+    missing ~ "not_found",
+    out$status %in% c("cancelled", "suspended") | out$stage == "cancelled" ~ "blocked",
+    out$status == "pending" | out$stage == "notified" ~ "attention",
+    is.na(out$status) ~ "attention",
+    TRUE ~ "ok"
+  )
+  out$note <- dplyr::case_when(
+    out$check == "invalid" ~ "Texto fora do formato de um c\u00f3digo do CAR.",
+    out$check == "not_found" ~ "C\u00f3digo n\u00e3o encontrado nesta publica\u00e7\u00e3o.",
+    out$status == "cancelled" | out$stage == "cancelled" ~ "Cadastro cancelado.",
+    out$status == "suspended" ~ "Cadastro suspenso.",
+    out$stage == "notified" ~ "Analisado, com notifica\u00e7\u00e3o sem resposta do declarante.",
+    out$status == "pending" ~ "Cadastro pendente.",
+    is.na(out$status) ~ "Situa\u00e7\u00e3o n\u00e3o reconhecida.",
+    TRUE ~ "Cadastro ativo, sem notifica\u00e7\u00e3o pendente."
+  )
+  out[c("property_code", "check", "note", "stage", setdiff(columns, "property_code"))]
+}

@@ -1,3 +1,8 @@
+# carbr (development version)
+
+* `car_check()`: verifica uma lista de códigos de imóvel de uma vez e resume o que consta
+  de cada um (`ok`, `attention`, `blocked`, `not_found`, `invalid`).
+
 # carbr 0.1.0
 
 * Primeira versão: `car_catalog()`, `car_dictionary()`, `car_summary()`,
