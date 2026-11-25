@@ -3,6 +3,7 @@
 [![R-CMD-check](https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/castlaboratory/carbr-r/actions/workflows/R-CMD-check.yaml)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24537631.svg)](https://doi.org/10.5281/zenodo.24537631)
 
 Os imóveis rurais declarados no **Cadastro Ambiental Rural (CAR)** no R,
 sem baixar a base inteira.
@@ -113,8 +114,15 @@ car_tbl("PE") |>
 As mesmas funções existem em Python:
 [carbr-py](https://github.com/castlaboratory/carbr-py).
 
-## Licença
+## Como citar
 
-Código sob licença MIT. Os dados são do Sicar; use
+O pacote está arquivado no Zenodo:
+[doi:10.5281/zenodo.24537631](https://doi.org/10.5281/zenodo.24537631)
+(o DOI aponta sempre para a versão mais recente). Os dados são do Sicar;
+use
 [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md)
 para citá-los.
+
+## Licença
+
+Código sob licença MIT.
