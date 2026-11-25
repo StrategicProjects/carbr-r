@@ -507,3 +507,112 @@ car_check <- function(code) {
   )
   out[c("property_code", "check", "note", "stage", setdiff(columns, "property_code"))]
 }
+
+#' Indicadores de qualidade do cadastro
+#'
+#' Dois sinais de inconsistência, calculados na publicação para cada imóvel
+#' não cancelado:
+#'
+#' * `overlap_count` e `overlap_share`: com quantos outros imóveis do estado
+#'   ele divide área, e que parcela da área dele está sobreposta (a soma das
+#'   interseções com cada vizinho, limitada a 1);
+#' * `outside_share`: que parcela da área fica fora do município declarado,
+#'   pela malha municipal do IBGE.
+#'
+#' `car_quality()` traz os indicadores por imóvel; `car_quality_summary()`,
+#' o resumo por município: imóveis não cancelados (`properties`), quantos
+#' têm sobreposição acima de 1% (`overlapping`) e de 50% da área
+#' (`overlapping_half`), os hectares sobrepostos (`overlap_ha`, somando os
+#' dois lados de cada par), e quantos imóveis (`outside_half`) e hectares
+#' (`outside_ha`) ficam fora do município declarado.
+#'
+#' Sobreposição não é sinônimo de disputa: inclui imóvel declarado duas
+#' vezes e lote dentro de assentamento. A comparação é só entre imóveis do
+#' mesmo estado.
+#'
+#' @param state Sigla de uma ou mais UFs. Em `car_quality_summary()`, `NULL`
+#'   (padrão) traz todas as publicadas.
+#' @param municipality Nomes ou códigos IBGE (7 dígitos) de municípios; lê
+#'   só os trechos deles.
+#' @returns Um tibble. `car_quality()`: `property_code`, `municipality_code`,
+#'   `overlap_count`, `overlap_share` e `outside_share`; junte a
+#'   [car_properties()] por `property_code`. Zero linhas (com aviso) se a
+#'   publicação não responder ou não trouxer os indicadores.
+#' @examplesIf interactive()
+#' car_quality("PE", municipality = "Petrolina")
+#' car_quality_summary("PE")
+#' @export
+car_quality <- function(state, municipality = NULL) {
+  empty <- tibble::tibble(
+    property_code = character(), municipality_code = integer(),
+    overlap_count = integer(), overlap_share = double(), outside_share = double()
+  )
+  cat <- car_catalog_json()
+  if (is.null(cat)) {
+    return(empty)
+  }
+  state <- car_check_state(state, names(cat$states))
+  sql <- car_data_sql(cat, "quality", state)
+  if (is.null(sql)) {
+    cat <- car_catalog_json(refresh = TRUE)
+    sql <- if (is.null(cat)) NULL else car_data_sql(cat, "quality", state)
+  }
+  if (is.null(sql)) {
+    cli::cli_warn(
+      c("!" = "This publication has no quality indicators.", "i" = "Returning an empty result."),
+      class = "carbr_error_http"
+    )
+    return(empty)
+  }
+  q <- dplyr::tbl(car_con(), dbplyr::sql(paste("SELECT * FROM", sql)))
+  if (!is.null(municipality)) {
+    codes <- car_municipality_codes(municipality, state)
+    q <- dplyr::filter(q, .data$municipality_code %in% !!codes)
+  }
+  out <- car_collect(q)
+  if (is.null(out)) {
+    return(empty)
+  }
+  tibble::as_tibble(out)[names(empty)]
+}
+
+#' @rdname car_quality
+#' @export
+car_quality_summary <- function(state = NULL) {
+  empty <- tibble::tibble(
+    state = character(), municipality_code = integer(), municipality = character(),
+    properties = integer(), overlapping = integer(), overlapping_half = integer(),
+    overlap_ha = double(), outside_half = integer(), outside_ha = double()
+  )
+  cat <- car_catalog_json()
+  if (is.null(cat)) {
+    return(empty)
+  }
+  state <- car_check_state(state, names(cat$states))
+  paths <- paste0("quality-municipalities/state=", state, ".parquet")
+  listed <- function(cat) vapply(cat$files, function(f) f$path, character(1))
+  if (!all(paths %in% listed(cat))) {
+    cat <- car_catalog_json(refresh = TRUE)
+    if (is.null(cat) || !all(paths %in% listed(cat))) {
+      cli::cli_warn(
+        c("!" = "This publication has no quality indicators.", "i" = "Returning an empty result."),
+        class = "carbr_error_http"
+      )
+      return(empty)
+    }
+  }
+  files <- lapply(paths, function(p) car_cached_file(cat, p))
+  if (any(vapply(files, is.null, logical(1)))) {
+    return(empty)
+  }
+  con <- car_con()
+  quoted <- as.character(DBI::dbQuoteString(con, unlist(files)))
+  out <- DBI::dbGetQuery(con, paste0(
+    "SELECT * FROM read_parquet([", paste(quoted, collapse = ", "), "]) ORDER BY municipality_code"
+  ))
+  counts <- c("properties", "overlapping", "overlapping_half", "outside_half")
+  out[counts] <- lapply(out[counts], as.integer)
+  names <- car_municipalities(state)[c("municipality_code", "municipality")]
+  out <- dplyr::left_join(tibble::as_tibble(out), names, by = "municipality_code")
+  out[names(empty)]
+}

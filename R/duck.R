@@ -131,6 +131,26 @@ car_parquet_sql <- function(cat, state, error_call = rlang::caller_env()) {
   paste0("read_parquet([", paste(quoted, collapse = ", "), "])")
 }
 
+#' `read_parquet([...])` over the per-state files `<prefix>/state=<UF>.parquet`
+#' that the catalogue lists; `NULL` when it lists none
+#' @noRd
+car_data_sql <- function(cat, prefix, state, error_call = rlang::caller_env()) {
+  base <- car_base_url(error_call)
+  paths <- vapply(cat$files, function(f) f$path, character(1))
+  keep <- paths[paths %in% paste0(prefix, "/state=", state, ".parquet")]
+  if (length(keep) == 0) {
+    return(NULL)
+  }
+  if (car_is_remote(base)) {
+    car_need_httpfs(car_con(), error_call)
+    files <- paste0(base, "/", vapply(keep, utils::URLencode, character(1)))
+  } else {
+    files <- file.path(base, keep)
+  }
+  quoted <- as.character(DBI::dbQuoteString(car_con(), files))
+  paste0("read_parquet([", paste(quoted, collapse = ", "), "])")
+}
+
 #' Run a query, turning a failed remote read into a warning and `NULL`
 #' @noRd
 car_collect <- function(query, error_call = rlang::caller_env()) {

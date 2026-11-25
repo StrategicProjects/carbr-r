@@ -65,6 +65,31 @@ release_teste <- function(env = parent.frame()) {
             sum(area_ha) AS area_ha
           FROM props GROUP BY ALL) TO '%s' (FORMAT parquet)", f_sum
   ))
+  # Quality indicators: property 1 sits inside property 6; the cancelled one is left out.
+  quality <- data.frame(
+    property_code = props$property_code[c(1, 2, 3, 6, 4)],
+    municipality_code = c(2611101L, 2611101L, 2611101L, 2611101L, 2611606L),
+    overlap_count = c(1L, 0L, 0L, 1L, 0L),
+    overlap_share = c(1, 0, 0, 0.04, 0),
+    outside_share = c(0, 0, 0.6, 0, 0)
+  )
+  duckdb::duckdb_register(con, "quality", quality)
+  dir.create(file.path(dir, "quality"))
+  dir.create(file.path(dir, "quality-municipalities"))
+  f_q <- file.path(dir, "quality", "state=PE.parquet")
+  f_qm <- file.path(dir, "quality-municipalities", "state=PE.parquet")
+  DBI::dbExecute(con, sprintf(
+    "COPY (SELECT * FROM quality ORDER BY municipality_code, property_code) TO '%s' (FORMAT parquet)", f_q
+  ))
+  DBI::dbExecute(con, sprintf(
+    "COPY (SELECT 'PE' AS state, q.municipality_code, count(*) AS properties,
+            count(*) FILTER (overlap_share > 0.01) AS overlapping,
+            count(*) FILTER (overlap_share > 0.5) AS overlapping_half,
+            sum(p.area_ha * overlap_share) AS overlap_ha,
+            count(*) FILTER (outside_share > 0.5) AS outside_half,
+            sum(p.area_ha * outside_share) AS outside_ha
+          FROM quality q JOIN props p USING (property_code) GROUP BY ALL) TO '%s' (FORMAT parquet)", f_qm
+  ))
   sha <- function(f) paste(unclass(openssl::sha256(file(f))), collapse = "")
   jsonlite::write_json(
     list(
@@ -77,7 +102,9 @@ release_teste <- function(env = parent.frame()) {
       files = list(
         list(path = "properties/state=PE/part-0.parquet", sha256 = sha(f_props)),
         list(path = "municipalities/state=PE.parquet", sha256 = sha(f_mun)),
-        list(path = "summary/state=PE.parquet", sha256 = sha(f_sum))
+        list(path = "summary/state=PE.parquet", sha256 = sha(f_sum)),
+        list(path = "quality/state=PE.parquet", sha256 = sha(f_q)),
+        list(path = "quality-municipalities/state=PE.parquet", sha256 = sha(f_qm))
       )
     ),
     file.path(dir, "catalog.json"),

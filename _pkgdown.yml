@@ -51,6 +51,10 @@ reference:
   - car_check
   - car_at
   - car_tbl
+- title: Qualidade do cadastro
+  desc: Sobreposição entre imóveis e área fora do município declarado.
+  contents:
+  - car_quality
 - title: Citar
   contents:
   - car_cite
