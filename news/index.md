@@ -16,3 +16,5 @@
 - Dados das 27 UFs (8.578.061 imóveis), posição de 24 e 25/11/2026.
 - [`car_summary()`](https://strategicprojects.github.io/carbr-r/reference/car_summary.md)
   lê um resumo pré-calculado: totais nacionais em segundos.
+- Guias novos: “Inconsistências do cadastro” e “Onde a análise está
+  parada”.
