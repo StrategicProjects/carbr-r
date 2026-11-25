@@ -65,6 +65,153 @@ São 2748 geometrias inválidas no país, mantidas na publicação e
 marcadas na coluna `geometry_valid`, e 29 imóveis com código de
 outra UF.
 
+## O país inteiro: sobreposição e imóveis fora do município
+
+Dois sinais são calculados na publicação para cada imóvel não cancelado, e
+ficam prontos para consulta: a parcela da área sobreposta a outros imóveis
+do estado e a parcela que fica fora do município declarado.
+`car_quality_summary()` traz o resumo por município; somando por UF:
+
+
+``` r
+quality <- car_quality_summary()
+
+by_state <- quality |>
+  group_by(state) |>
+  summarise(
+    properties = sum(properties),
+    overlapping_half = sum(overlapping_half),
+    outside_half = sum(outside_half)
+  ) |>
+  mutate(
+    share_overlapping = round(100 * overlapping_half / properties, 1),
+    share_outside = round(100 * outside_half / properties, 2)
+  ) |>
+  arrange(desc(share_overlapping))
+by_state |> print(n = 27)
+#> # A tibble: 27 × 6
+#>    state properties overlapping_half outside_half share_overlapping
+#>    <chr>      <int>            <int>        <int>             <dbl>
+#>  1 DF         20826            15830           10              76  
+#>  2 AC         57680            36265          294              62.9
+#>  3 RR         27139            16801          215              61.9
+#>  4 AP         16906             9983          192              59.1
+#>  5 MA        414258           238954         8819              57.7
+#>  6 MT        206064            97781         3397              47.5
+#>  7 AM         95521            44325          780              46.4
+#>  8 PA        345391           157621         2513              45.6
+#>  9 RO        188779            75054         1790              39.8
+#> 10 AL        141643            55653         3422              39.3
+#> 11 PI        335190           109991         7123              32.8
+#> 12 CE        406007           126627         7794              31.2
+#> 13 MG       1175484           367167        14066              31.2
+#> 14 PE        434153           130542         8665              30.1
+#> 15 SE        124631            37085         1527              29.8
+#> 16 RN        116984            34708         3280              29.7
+#> 17 PB        220048            53737         5862              24.4
+#> 18 GO        242639            54527         2742              22.5
+#> 19 RJ         68625            14892         1095              21.7
+#> 20 SC        435122            79425         6457              18.3
+#> 21 ES        128629            23151          982              18  
+#> 22 PR        552854            96564         4687              17.5
+#> 23 RS        676157           100100         6930              14.8
+#> 24 SP        451407            65649         5615              14.5
+#> 25 MS         88788            11171          845              12.6
+#> 26 TO        103190            12743         1182              12.3
+#> 27 BA       1331675            45222        17019               3.4
+#>    share_outside
+#>            <dbl>
+#>  1          0.05
+#>  2          0.51
+#>  3          0.79
+#>  4          1.14
+#>  5          2.13
+#>  6          1.65
+#>  7          0.82
+#>  8          0.73
+#>  9          0.95
+#> 10          2.42
+#> 11          2.13
+#> 12          1.92
+#> 13          1.2 
+#> 14          2   
+#> 15          1.23
+#> 16          2.8 
+#> 17          2.66
+#> 18          1.13
+#> 19          1.6 
+#> 20          1.48
+#> 21          0.76
+#> 22          0.85
+#> 23          1.02
+#> 24          1.24
+#> 25          0.95
+#> 26          1.15
+#> 27          1.28
+```
+
+
+
+No país, 25% dos imóveis não cancelados têm mais da metade da área
+sobreposta a outros cadastros, e 117303 têm mais da metade da área fora do
+município em que foram registrados. A diferença entre os estados é grande:
+
+
+``` r
+states <- ibge_mesh("paises/BR?intrarregiao=UF&")
+ufs <- c(
+  "11" = "RO", "12" = "AC", "13" = "AM", "14" = "RR", "15" = "PA", "16" = "AP", "17" = "TO",
+  "21" = "MA", "22" = "PI", "23" = "CE", "24" = "RN", "25" = "PB", "26" = "PE", "27" = "AL",
+  "28" = "SE", "29" = "BA", "31" = "MG", "32" = "ES", "33" = "RJ", "35" = "SP", "41" = "PR",
+  "42" = "SC", "43" = "RS", "50" = "MS", "51" = "MT", "52" = "GO", "53" = "DF"
+)
+
+states |>
+  mutate(state = ufs[codarea]) |>
+  left_join(by_state, by = "state") |>
+  ggplot() +
+  geom_sf(aes(fill = share_overlapping), colour = "white", linewidth = 0.2) +
+  scale_fill_gradient(
+    low = "#fff4e6", high = "#c92a2a", limits = c(0, NA),
+    labels = function(x) paste0(x, "%"), name = "Imóveis com mais\nda metade da\nárea sobreposta"
+  ) +
+  labs(
+    title = "Sobreposição entre imóveis do CAR, por UF",
+    caption = "Fontes: SFB/Sicar, via carbr; malha do IBGE. Imóveis não cancelados."
+  ) +
+  theme_void() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+<div class="figure" style="text-align: center">
+<img src="inconsistencias-brasil-1.png" alt="Mapa do Brasil com a parcela dos imóveis de cada UF que têm mais da metade da área sobreposta."  />
+<p class="caption">plot of chunk brasil</p>
+</div>
+
+Sobreposição não é sinônimo de disputa: entra na conta o mesmo imóvel
+declarado duas vezes e o lote que fica dentro de um assentamento. É um sinal
+de onde a análise tem mais a conferir. Os municípios com mais casos:
+
+
+``` r
+quality |>
+  arrange(desc(overlapping_half)) |>
+  select(state, municipality, properties, overlapping_half, outside_half)
+#> # A tibble: 5,563 × 5
+#>   state municipality       properties overlapping_half outside_half
+#>   <chr> <chr>                   <int>            <int>        <int>
+#> 1 DF    Brasília                20826            15830           10
+#> 2 RO    Porto Velho             23819            14018           53
+#> 3 MG    Januária                12397             9113           90
+#> 4 MA    Caxias                  10714             7716          154
+#> 5 PA    Marabá                   9638             7454           56
+#> 6 RO    Machadinho D'Oeste       8895             7100           37
+#> # ℹ 5,557 more rows
+```
+
+`car_quality()` desce ao imóvel. Mais adiante, este guia refaz a conta de um
+município passo a passo, para mostrar de onde os números vêm.
+
 ## O código diz um município, o cadastro diz outro
 
 O código do imóvel traz o município em que ele foi registrado
@@ -298,9 +445,9 @@ car_tbl("PE") |>
 #> # A tibble: 3 × 3
 #>   property_type         properties area_ha
 #>   <chr>                      <dbl>   <dbl>
-#> 1 traditional_community         65 164138.
-#> 2 rural_property                 1    926.
-#> 3 settlement                   432 651693.
+#> 1 rural_property                 1    926.
+#> 2 settlement                   432 651693.
+#> 3 traditional_community         65 164138.
 ```
 
 Quem conta "pequenos produtores" pelo porte deve separar o tipo do imóvel
