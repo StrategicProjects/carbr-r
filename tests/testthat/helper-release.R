@@ -16,7 +16,7 @@ release_teste <- function(env = parent.frame()) {
     status = c("active", "active", "pending", "active", "cancelled", "active"),
     condition = "Aguardando análise",
     property_type_code = "IRU", property_type = "rural_property",
-    created_at = as.POSIXct("2020-01-01", tz = "UTC"),
+    created_at = as.POSIXct("2020-06-01", tz = "UTC"),
     area_ha = c(10, 20, 30, 40, 50, 6000),
     fiscal_modules = c(0.2, 0.4, 0.6, 5, 6, 100),
     size_class = c("small", "small", "small", "medium", "medium", "large"),
@@ -55,6 +55,14 @@ release_teste <- function(env = parent.frame()) {
             min(xmin) AS xmin, min(ymin) AS ymin, max(xmax) AS xmax, max(ymax) AS ymax
           FROM props GROUP BY ALL) TO '%s' (FORMAT parquet)", f_mun
   ))
+  dir.create(file.path(dir, "summary"))
+  f_sum <- file.path(dir, "summary", "state=PE.parquet")
+  DBI::dbExecute(con, sprintf(
+    "COPY (SELECT state, status, size_class, property_type, condition,
+            year(created_at)::INTEGER AS created_year, count(*) AS properties,
+            sum(area_ha) AS area_ha
+          FROM props GROUP BY ALL) TO '%s' (FORMAT parquet)", f_sum
+  ))
   sha <- function(f) paste(unclass(openssl::sha256(file(f))), collapse = "")
   jsonlite::write_json(
     list(
@@ -66,7 +74,8 @@ release_teste <- function(env = parent.frame()) {
       )),
       files = list(
         list(path = "properties/state=PE/part-0.parquet", sha256 = sha(f_props)),
-        list(path = "municipalities/state=PE.parquet", sha256 = sha(f_mun))
+        list(path = "municipalities/state=PE.parquet", sha256 = sha(f_mun)),
+        list(path = "summary/state=PE.parquet", sha256 = sha(f_sum))
       )
     ),
     file.path(dir, "catalog.json"),

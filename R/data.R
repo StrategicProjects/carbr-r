@@ -134,6 +134,61 @@ car_municipalities <- function(state = NULL) {
   tibble::as_tibble(out)
 }
 
+#' Resumo pré-calculado
+#'
+#' Contagem de imóveis e área declarada por qualquer combinação de UF,
+#' situação, porte, tipo, etapa da análise e ano de criação do cadastro.
+#' Lê tabelas pequenas, calculadas na publicação e guardadas em cache:
+#' responde em segundos mesmo para o país inteiro, sem ler os imóveis.
+#'
+#' @param by Dimensões do resumo, uma ou mais de `"state"`, `"status"`,
+#'   `"size_class"`, `"property_type"`, `"condition"` e `"created_year"`.
+#'   `NULL` devolve uma linha só, com o total.
+#' @inheritParams car_municipalities
+#' @returns Um tibble com as colunas de `by`, `properties` (número de
+#'   imóveis) e `area_ha` (área declarada, em hectares). Zero linhas (com
+#'   aviso) se a publicação não responder.
+#' @examplesIf interactive()
+#' car_summary("state")
+#' car_summary(c("size_class", "status"), state = "PE")
+#' car_summary("created_year")
+#' @export
+car_summary <- function(by = "state", state = NULL) {
+  dims <- c("state", "status", "size_class", "property_type", "condition", "created_year")
+  by <- if (is.null(by)) character() else rlang::arg_match(by, dims, multiple = TRUE)
+  empty <- tibble::tibble(
+    state = character(), status = character(), size_class = character(),
+    property_type = character(), condition = character(),
+    created_year = integer(), properties = integer(), area_ha = double()
+  )[c(by, "properties", "area_ha")]
+  cat <- car_catalog_json()
+  if (is.null(cat)) {
+    return(empty)
+  }
+  state <- car_check_state(state, names(cat$states))
+  paths <- paste0("summary/state=", state, ".parquet")
+  listed <- function(cat) vapply(cat$files, function(f) f$path, character(1))
+  if (!all(paths %in% listed(cat))) {
+    # A catalogue cached before the summary was published.
+    cat <- car_catalog_json(refresh = TRUE)
+    if (is.null(cat)) {
+      return(empty)
+    }
+  }
+  files <- lapply(paths, function(p) car_cached_file(cat, p))
+  if (any(vapply(files, is.null, logical(1)))) {
+    return(empty)
+  }
+  con <- car_con()
+  quoted <- as.character(DBI::dbQuoteString(con, unlist(files)))
+  cols <- paste(c(by, "sum(properties)::INTEGER AS properties", "sum(area_ha) AS area_ha"), collapse = ", ")
+  out <- DBI::dbGetQuery(con, paste0(
+    "SELECT ", cols, " FROM read_parquet([", paste(quoted, collapse = ", "), "])",
+    if (length(by) > 0) paste0(" GROUP BY ", paste(by, collapse = ", "), " ORDER BY ", paste(by, collapse = ", "))
+  ))
+  tibble::as_tibble(out)
+}
+
 #' Municipality codes from codes or names
 #' @noRd
 car_municipality_codes <- function(municipality, state, error_call = rlang::caller_env()) {

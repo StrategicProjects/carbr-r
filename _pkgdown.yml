@@ -35,6 +35,7 @@ reference:
   contents:
   - car_catalog
   - car_dictionary
+  - car_summary
   - car_municipalities
 - title: Obter os imóveis
   contents:

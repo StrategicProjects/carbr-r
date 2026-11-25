@@ -24,6 +24,7 @@ pak::pak("StrategicProjects/carbr-r")
 library(carbr)
 
 car_catalog()                       # UFs publicadas, versão e qualidade da carga
+car_summary(c("state", "size_class"))   # totais do país, sem ler os imóveis
 car_municipalities("PE")            # resumo por município
 
 # Imóveis grandes de Petrolina, como objeto sf
@@ -45,6 +46,7 @@ car_tbl("PE") |>
 |---|---|
 | `car_catalog()` | O que está publicado, com versão e indicadores de qualidade |
 | `car_dictionary()` | Dicionário de dados: coluna, nome no Sicar, descrição |
+| `car_summary()` | Totais pré-calculados por UF, situação, porte, tipo, etapa da análise e ano |
 | `car_municipalities()` | Resumo por município |
 | `car_properties()` | Imóveis de uma UF, com filtros aplicados antes da leitura |
 | `car_property()` | Um imóvel pelo código |
@@ -58,7 +60,8 @@ car_tbl("PE") |>
   autodeclarado: há sobreposições entre imóveis, e a presença no CAR não comprova domínio.
 - **Conteúdo:** o perímetro declarado e dez atributos de cada imóvel (código, situação, etapa da
   análise, tipo, data, área, módulos fiscais, município). Não há dado pessoal.
-- **Cobertura:** por enquanto, Pernambuco. `car_catalog()` mostra o que está publicado e a data.
+- **Cobertura:** as 27 UFs, cerca de 8,6 milhões de imóveis. `car_catalog()` mostra o que está
+  publicado e a data.
 - **Endereço:** o padrão é um bucket público; `options(carbr.base_url = )` ou a variável
   `CAR_URL` apontam para um espelho compatível com S3 ou para uma pasta local.
 

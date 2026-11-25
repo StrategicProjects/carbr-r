@@ -12,14 +12,16 @@ vignette: >
 O **Cadastro Ambiental Rural (CAR)** é o registro público eletrônico dos
 imóveis rurais do país, criado pelo Código Florestal (Lei nº 12.651/2012) e
 mantido no Sicar pelo Serviço Florestal Brasileiro. O `carbr` lê uma
-republicação dos dados públicos do cadastro em GeoParquet: cada consulta
-transfere só os trechos do arquivo de que precisa, sem baixar a base de um
-estado inteiro e sem passar pelos servidores do Sicar.
+republicação dos dados públicos do cadastro em GeoParquet, com as 27 UFs e
+cerca de 8,6 milhões de imóveis. Cada consulta transfere só os trechos do
+arquivo de que precisa, sem baixar a base de um estado inteiro e sem passar
+pelos servidores do Sicar.
 
 | Função | Para quê |
 |---|---|
 | `car_catalog()` | O que está publicado |
 | `car_dictionary()` | O que cada coluna significa |
+| `car_summary()` | Totais pré-calculados, do estado ou do país |
 | `car_municipalities()` | Resumo por município |
 | `car_properties()` | Imóveis de uma UF, com filtros |
 | `car_property()` | Um imóvel pelo código |
@@ -37,22 +39,35 @@ library(ggplot2)
 ## O que está publicado
 
 `car_catalog()` traz uma linha por UF, com o número de imóveis e os
-indicadores de qualidade da carga. A versão é a data em que os dados foram
-lidos do Sicar.
+indicadores de qualidade da carga. A versão é a data da última atualização
+da publicação.
 
 
 ``` r
 cat <- car_catalog()
 cat
-#> # A tibble: 1 × 6
+#> # A tibble: 27 × 6
 #>   state properties municipalities invalid_geometries null_geometries
 #>   <chr>      <int>          <int>              <int>           <int>
-#> 1 PE        436190            184                 50               0
+#> 1 AC         63349             22                 19               0
+#> 2 AL        143973            102                 19               0
+#> 3 AM         99056             62                 94               0
+#> 4 AP         17834             16                  2               0
+#> 5 BA       1334593            416                  2               0
+#> 6 CE        410650            184                 56               0
 #>   registered_in_other_state
 #>                       <int>
-#> 1                         7
+#> 1                         0
+#> 2                         5
+#> 3                         0
+#> 4                         0
+#> 5                         1
+#> 6                         3
+#> # ℹ 21 more rows
 attr(cat, "version")
 #> [1] "2026-11-25"
+sum(cat$properties)
+#> [1] 8578061
 ```
 
 O dicionário de dados diz o que é cada coluna e qual era o seu nome no Sicar.
@@ -111,33 +126,166 @@ car_dictionary() |> print(n = 22)
 #> 22 Perímetro declarado do imóvel, WKB, EPSG:4674. Nulo se o Sicar não traz.
 ```
 
-## Resumo por município
+## O país inteiro, sem ler os imóveis
 
-Para contagens, não é preciso ler os imóveis: o resumo municipal é um
-arquivo pequeno, guardado em cache.
+`car_summary()` lê tabelas pequenas, calculadas na publicação, com a
+contagem de imóveis e a área declarada por UF, situação, porte, tipo, etapa
+da análise e ano de criação do cadastro. O argumento `by` escolhe as
+dimensões; `NULL` dá o total.
 
 
 ``` r
-car_municipalities("PE") |>
+car_summary(NULL)
+#> # A tibble: 1 × 2
+#>   properties    area_ha
+#>        <int>      <dbl>
+#> 1    8578061 816130359.
+car_summary("size_class")
+#> # A tibble: 3 × 3
+#>   size_class properties    area_ha
+#>   <chr>           <int>      <dbl>
+#> 1 large          142974 410551844.
+#> 2 medium         398351 133970230.
+#> 3 small         8036736 271608284.
+```
+
+Os pequenos imóveis, de até quatro módulos fiscais, são mais de nove em cada
+dez cadastros e um terço da área declarada. Por UF:
+
+
+``` r
+by_state <- car_summary(c("state", "size_class"))
+
+by_state |>
+  mutate(
+    state = reorder(state, properties, sum),
+    size_class = factor(size_class, c("large", "medium", "small"))
+  ) |>
+  ggplot(aes(properties / 1e3, state, fill = size_class)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c(small = "#8fbf9f", medium = "#3d8a5c", large = "#123a23"),
+    breaks = c("small", "medium", "large"),
+    labels = c("Pequeno (até 4 módulos fiscais)", "Médio (4 a 15)", "Grande (acima de 15)"),
+    name = NULL
+  ) +
+  labs(
+    title = "Imóveis declarados no CAR, por UF e porte",
+    x = "Milhares de imóveis", y = NULL,
+    caption = "Fonte: SFB/Sicar, via carbr."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+<div class="figure" style="text-align: center">
+<img src="carbr-estados-1.png" alt="Barras horizontais com o número de imóveis no CAR por UF, separadas por porte."  />
+<p class="caption">plot of chunk estados</p>
+</div>
+
+A etapa da análise mostra onde o cadastro está parado:
+
+
+``` r
+car_summary("condition") |>
   arrange(desc(properties)) |>
-  select(municipality, properties, small_properties, area_ha, pending)
-#> # A tibble: 184 × 5
-#>   municipality properties small_properties area_ha pending
-#>   <chr>             <int>            <int>   <dbl>   <int>
-#> 1 Araripina         15663            15625 187423.       1
-#> 2 Ouricuri          14200            14182 219157.       6
-#> 3 Petrolina         10918            10799 411153.      11
-#> 4 Buíque             9734             9651 109496.       3
-#> 5 Bodocó             7271             7236 147941.       2
-#> 6 Custódia           6598             6540 153166.       1
-#> # ℹ 178 more rows
+  mutate(share = round(100 * properties / sum(properties), 1)) |>
+  select(condition, properties, share) |>
+  print(n = 8)
+#> # A tibble: 15 × 3
+#>   condition                                                                 
+#>   <chr>                                                                     
+#> 1 Aguardando análise                                                        
+#> 2 Analisado, aguardando atendimento a notificação                           
+#> 3 Analisado, em conformidade com a Lei nº 12.651/2012                       
+#> 4 Analisado, em conformidade com a Lei nº 12.651/2012, com ativos ambientais
+#> 5 Analisado, aguardando regularização ambiental (Lei nº 12.651/2012)        
+#> 6 Cancelado por decisão administrativa                                      
+#> 7 Aguardando análise, após revisão ou atendimento da notificação            
+#> 8 Em análise                                                                
+#>   properties share
+#>        <int> <dbl>
+#> 1    5978543  69.7
+#> 2    1309315  15.3
+#> 3     460502   5.4
+#> 4     191767   2.2
+#> 5     189447   2.2
+#> 6     161970   1.9
+#> 7     134338   1.6
+#> 8     109335   1.3
+#> # ℹ 7 more rows
+```
+
+E o ano de criação dá a linha do tempo do cadastramento:
+
+
+``` r
+car_summary("created_year") |>
+  ggplot(aes(created_year, properties / 1e3)) +
+  geom_col(fill = "#1f5f3a") +
+  scale_x_continuous(breaks = 2014:2026) +
+  labs(
+    title = "Cadastros hoje no CAR, por ano de criação",
+    x = NULL, y = "Milhares de imóveis",
+    caption = "Fonte: SFB/Sicar, via carbr. O último ano está incompleto."
+  ) +
+  theme_minimal()
+```
+
+<div class="figure" style="text-align: center">
+<img src="carbr-anos-1.png" alt="Colunas com o número de cadastros criados por ano, de 2014 a 2026."  />
+<p class="caption">plot of chunk anos</p>
+</div>
+
+As dimensões combinam, e `state` restringe a uma ou mais UFs:
+
+
+``` r
+car_summary(c("status", "size_class"), state = c("PE", "BA"))
+#> # A tibble: 12 × 4
+#>    status    size_class properties   area_ha
+#>    <chr>     <chr>           <int>     <dbl>
+#>  1 active    large            8236 15511306.
+#>  2 active    medium          27968  9622438.
+#>  3 active    small         1725262 23741938.
+#>  4 cancelled large             164   760332.
+#>  5 cancelled medium            250    94439.
+#>  6 cancelled small            4541   232247.
+#>  7 pending   large             222   487656.
+#>  8 pending   medium            420   137210.
+#>  9 pending   small            3669    87631.
+#> 10 suspended large              13    67994.
+#> 11 suspended medium              8     2959.
+#> 12 suspended small              30     2373.
+```
+
+## Resumo por município
+
+O resumo municipal também é pré-calculado. Sem argumento, traz os
+municípios de todas as UFs.
+
+
+``` r
+car_municipalities() |>
+  arrange(desc(properties)) |>
+  select(state, municipality, properties, small_properties, area_ha, pending)
+#> # A tibble: 5,564 × 6
+#>   state municipality      properties small_properties  area_ha pending
+#>   <chr> <chr>                  <int>            <int>    <dbl>   <int>
+#> 1 RO    Porto Velho            25819            24145 3296893.    5446
+#> 2 BA    Monte Santo            24609            24541  188974.       0
+#> 3 DF    Brasília               21049            17597 1202233.     135
+#> 4 BA    Pilão Arcado           16403            16241 1061906.       1
+#> 5 PE    Araripina              15663            15625  187423.       1
+#> 6 BA    Euclides da Cunha      14962            14892  135744.      44
+#> # ℹ 5,558 more rows
 ```
 
 ## Imóveis de um município
 
 Os filtros de `car_properties()` são aplicados antes da leitura. Aqui, os
-imóveis médios e grandes de Petrolina — algumas centenas, de um arquivo com
-mais de 400 mil. Com o pacote `sf` instalado, o resultado é um objeto `sf`
+imóveis médios e grandes de Petrolina, em Pernambuco — algumas centenas, de
+um arquivo com mais de 400 mil. Com o pacote `sf` instalado, o resultado é um objeto `sf`
 em SIRGAS 2000.
 
 
@@ -225,22 +373,25 @@ pending |> count(municipality, sort = TRUE)
 
 ## Que imóveis estão declarados aqui?
 
-`car_at()` devolve os imóveis que contêm um ponto. Como o cadastro é
-autodeclarado, sobreposições são comuns e o resultado pode ter mais de uma
-linha.
+`car_at()` devolve os imóveis que contêm um ponto, procurando em todas as
+UFs (ou só nas de `state`). Como o cadastro é autodeclarado, sobreposições
+são comuns e o resultado pode ter mais de uma linha, como neste ponto do
+Distrito Federal:
 
 
 ``` r
-car_at(lon = -40.5, lat = -9.2) |>
+car_at(lon = -47.9, lat = -15.8) |>
   sf::st_drop_geometry() |>
   select(property_code, municipality, area_ha, status, condition)
-#> # A tibble: 1 × 5
-#>   property_code                               municipality area_ha status
-#>   <chr>                                       <chr>          <dbl> <chr> 
-#> 1 PE-2611101-588BC484570D440484F527F07DF5AFFA Petrolina     81579. active
-#>   condition         
-#>   <chr>             
-#> 1 Aguardando análise
+#> # A tibble: 2 × 5
+#>   property_code                               municipality area_ha status   
+#>   <chr>                                       <chr>          <dbl> <chr>    
+#> 1 DF-5300108-AB840D7B499B43E69C3D999165FF2475 Brasília      94379. cancelled
+#> 2 DF-5300108-1274A9532343473DB7413440C0ABF8AD Brasília     103415. cancelled
+#>   condition                           
+#>   <chr>                               
+#> 1 Cancelado por decisão administrativa
+#> 2 Cancelado por decisão administrativa
 ```
 
 ## Um imóvel pelo código
@@ -276,22 +427,29 @@ car_property("PE-2611101-588BC484570D440484F527F07DF5AFFA", geometry = FALSE) |>
 
 ## Consultas próprias
 
-`car_tbl()` devolve uma tabela preguiçosa do `dplyr` sobre os arquivos
-publicados. Nada é lido até o `collect()`, e a agregação roda sobre o
-arquivo remoto lendo só as colunas usadas.
+Para o que `car_summary()` não cobre, `car_tbl()` devolve uma tabela
+preguiçosa do `dplyr` sobre os arquivos publicados. Nada é lido até o
+`collect()`, e a consulta roda sobre o arquivo remoto lendo só as colunas
+usadas. Convém restringir a uma UF: sobre o país inteiro, uma agregação lê
+colunas de 8,6 milhões de linhas e leva minutos.
 
 
 ``` r
 car_tbl("PE") |>
-  group_by(size_class) |>
+  filter(fiscal_modules > 15, status == "active") |>
+  group_by(municipality) |>
   summarise(properties = n(), area_ha = sum(area_ha, na.rm = TRUE)) |>
+  arrange(desc(area_ha)) |>
+  head(5) |>
   collect()
-#> # A tibble: 3 × 3
-#>   size_class properties  area_ha
-#>   <chr>           <dbl>    <dbl>
-#> 1 large            1373 1229005.
-#> 2 medium           5167 1272210.
-#> 3 small          429650 5934124.
+#> # A tibble: 5 × 3
+#>   municipality             properties area_ha
+#>   <chr>                         <dbl>   <dbl>
+#> 1 Santa Maria da Boa Vista          7  44671.
+#> 2 Serra Talhada                    17  33847.
+#> 3 Floresta                         25  33767.
+#> 4 Ibimirim                         22  32990.
+#> 5 Tacaratu                         12  32455.
 ```
 
 ## Como citar
@@ -309,4 +467,5 @@ car_cite()
 O pacote lê de um bucket público. Para usar um espelho compatível com S3 ou
 uma cópia local da publicação, defina `options(carbr.base_url = )` ou a
 variável de ambiente `CAR_URL`. O catálogo e o resumo municipal ficam em
-cache em `car_cache_dir()`; os imóveis nunca são copiados para o disco.
+cache em `car_cache_dir()`, e o catálogo vale por seis horas
+(`car_catalog(refresh = TRUE)` o relê); os imóveis nunca são copiados para o disco.

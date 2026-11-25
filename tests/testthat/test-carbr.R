@@ -13,6 +13,24 @@ test_that("the catalogue, the dictionary and the municipal summary are tibbles",
   expect_type(mun$properties, "integer")
 })
 
+test_that("car_summary() aggregates the precomputed table by any dimension", {
+  skip_if_not_installed("sf")
+  release_teste()
+  by_size <- car_summary("size_class")
+  expect_equal(by_size$size_class, c("large", "medium", "small"))
+  expect_equal(by_size$properties, c(1L, 2L, 3L))
+  expect_equal(by_size$area_ha, c(6000, 90, 60))
+  expect_type(by_size$properties, "integer")
+  total <- car_summary(NULL)
+  expect_equal(dim(total), c(1L, 2L))
+  expect_equal(total$properties, 6L)
+  two <- car_summary(c("state", "status"), state = "PE")
+  expect_equal(names(two), c("state", "status", "properties", "area_ha"))
+  expect_equal(sum(two$properties), 6L)
+  expect_equal(car_summary("created_year")$created_year, 2020L)
+  expect_error(car_summary("municipality"))
+})
+
 test_that("car_properties() filters by municipality name or code, status, size and bbox", {
   skip_if_not_installed("sf")
   release_teste()
