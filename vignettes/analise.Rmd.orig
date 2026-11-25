@@ -215,3 +215,73 @@ ggplot(mesh) +
 É uma lista de onde um mutirão, um sindicato ou um serviço de atendimento
 ao produtor rende mais: municípios com muitos imóveis já analisados à espera
 de uma resposta que depende só de o declarante entender o que foi pedido.
+
+## Uma tipologia dos municípios
+
+As etapas da análise, o porte dos imóveis e a sobreposição entre cadastros
+variam juntos, e os municípios se parecem em blocos. `car_typology()` resume
+isso: cada município entra num de cinco grupos, achados por agrupamento
+(k-médias) sobre sete indicadores do cadastro. Os grupos ficam fixos de uma
+atualização para a outra, de modo que dá para acompanhar um município
+mudando de grupo.
+
+```{r}
+car_typology_groups() |>
+  select(typology_label, municipalities, properties, description)
+```
+
+O perfil médio de cada grupo mostra de onde vêm os nomes:
+
+```{r}
+typology <- car_typology()
+
+typology |>
+  group_by(typology_label) |>
+  summarise(across(small_share:coverage, \(x) round(mean(x, na.rm = TRUE), 2))) |>
+  as.data.frame()
+```
+
+```{r tipologia, fig.height = 7.4, fig.alt = "Mapa do Brasil com os municípios coloridos pelo grupo da tipologia."}
+groups <- c(
+  "Pequenos imóveis à espera de análise" = "#adb5bd",
+  "Grandes imóveis à espera de análise" = "#4c6ef5",
+  "Análise avançada" = "#37b24d",
+  "Notificados sem resposta" = "#f76707",
+  "Muita sobreposição" = "#c2255c",
+  "Poucos cadastros" = "#f1f3f5"
+)
+
+brazil <- sf::read_sf(paste0(
+  "https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?intrarregiao=municipio",
+  "&formato=application/vnd.geo%2Bjson&qualidade=minima"
+)) |>
+  mutate(municipality_code = as.integer(codarea)) |>
+  left_join(typology, by = "municipality_code") |>
+  mutate(typology_label = factor(typology_label, names(groups)))
+
+ggplot(brazil) +
+  geom_sf(aes(fill = typology_label), colour = NA) +
+  scale_fill_manual(values = groups, na.value = "#f1f3f5", na.translate = FALSE, name = NULL) +
+  labs(
+    title = "Tipologia dos municípios pelo perfil do CAR",
+    caption = "Fontes: SFB/Sicar, via carbr; malha municipal do IBGE."
+  ) +
+  guides(fill = guide_legend(ncol = 2)) +
+  theme_void() +
+  theme(legend.position = "bottom", plot.title = element_text(face = "bold"))
+```
+
+O mapa separa situações que pedem respostas diferentes. Onde a análise mal
+começou, o gargalo é a capacidade do órgão ambiental. Onde os cadastros
+estão notificados e sem resposta, é o atendimento ao declarante. Onde a
+sobreposição domina, é a qualidade do que foi declarado. E um estado pode
+ter mais de uma dessas situações:
+
+```{r}
+typology |>
+  count(state, typology_label) |>
+  group_by(state) |>
+  slice_max(n, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  count(typology_label, name = "states")
+```

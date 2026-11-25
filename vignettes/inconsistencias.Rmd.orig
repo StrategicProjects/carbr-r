@@ -136,6 +136,85 @@ quality |>
 `car_quality()` desce ao imóvel. Mais adiante, este guia refaz a conta de um
 município passo a passo, para mostrar de onde os números vêm.
 
+## Terras indígenas e unidades de conservação
+
+O mesmo resumo traz quantos imóveis têm mais de 1% da área dentro de uma
+terra indígena (camada da Funai, em todas as fases do processo) ou de uma
+unidade de conservação (Cadastro Nacional de Unidades de Conservação, do
+MMA). Nas unidades de conservação o grupo importa: as de proteção integral,
+como parques e estações ecológicas, em regra não admitem imóveis privados;
+as de uso sustentável incluem as áreas de proteção ambiental (APA) e as
+reservas particulares (RPPN), onde a propriedade privada é normal.
+
+```{r}
+protected <- quality |>
+  group_by(state) |>
+  summarise(
+    properties = sum(properties),
+    indigenous = sum(indigenous),
+    strict_protection = sum(strict_protection),
+    sustainable_use = sum(sustainable_use)
+  )
+
+protected |>
+  summarise(across(-state, sum))
+```
+
+```{r protegidas, fig.height = 6, fig.alt = "Barras horizontais com o número de imóveis de cada UF em terra indígena e em unidade de conservação de proteção integral."}
+protected |>
+  tidyr::pivot_longer(c(indigenous, strict_protection), names_to = "kind", values_to = "n") |>
+  mutate(
+    kind = c(indigenous = "Terra indígena", strict_protection = "Proteção integral")[kind],
+    state = reorder(state, n, sum)
+  ) |>
+  ggplot(aes(n, state, fill = kind)) +
+  geom_col() +
+  scale_fill_manual(values = c("Terra indígena" = "#c2255c", "Proteção integral" = "#2b8a3e"), name = NULL) +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ".", decimal.mark = ",")) +
+  labs(
+    title = "Imóveis do CAR sobre terra indígena ou unidade de proteção integral",
+    subtitle = "Imóveis não cancelados com mais de 1% da área dentro dessas áreas",
+    x = NULL, y = NULL,
+    caption = "Fontes: SFB/Sicar, via carbr; Funai; CNUC/MMA."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom", plot.title = element_text(face = "bold"))
+```
+
+Os municípios com mais casos, em cada tipo:
+
+```{r}
+quality |>
+  arrange(desc(indigenous)) |>
+  select(state, municipality, properties, indigenous, indigenous_ha)
+
+quality |>
+  arrange(desc(strict_protection)) |>
+  select(state, municipality, properties, strict_protection, strict_protection_ha)
+```
+
+Por imóvel, `car_quality()` traz a parcela da área e o nome da terra
+indígena ou da unidade de conservação. É o que `car_check()` usa na triagem:
+um cadastro ativo passa de `"ok"` a `"attention"` quando mais de 1% da área
+está em terra indígena ou em unidade de proteção integral, e a nota diz
+qual.
+
+```{r}
+aguas_belas <- car_quality("PE", municipality = "Águas Belas")
+
+aguas_belas |>
+  filter(indigenous_share > 0.5) |>
+  select(property_code, indigenous_share, indigenous_land) |>
+  head(3)
+
+car_check(head(aguas_belas$property_code[aguas_belas$indigenous_share > 0.5], 2)) |>
+  select(check, note)
+```
+
+O sinal vem de perímetros autodeclarados cruzados com limites oficiais, e
+não é uma conclusão sobre o imóvel: há terras indígenas ainda em estudo, e
+cadastros anteriores à criação de uma unidade de conservação.
+
 ## O código diz um município, o cadastro diz outro
 
 O código do imóvel traz o município em que ele foi registrado
