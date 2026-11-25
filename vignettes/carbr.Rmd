@@ -320,7 +320,8 @@ petrolina |> select(property_code, status, area_ha, fiscal_modules, size_class)
 
 Sobre uma imagem de satélite, o cadastro mostra a ocupação do município: os
 lotes estreitos dos perímetros irrigados junto ao rio São Francisco, ao sul
-e a leste, e os imóveis maiores da caatinga, ao norte. O fundo vem do pacote
+e a leste, e os imóveis maiores da caatinga, ao norte. O limite municipal é
+da malha do IBGE, lida direto da API de malhas; o fundo vem do pacote
 `maptiles` e é desenhado com o `tidyterra`.
 
 
@@ -330,7 +331,16 @@ valid <- petrolina |>
   mutate(size_class = factor(size_class, c("small", "medium", "large"))) |>
   arrange(desc(area_ha))
 
-imagery <- maptiles::get_tiles(valid, provider = "Esri.WorldImagery", zoom = 10, crop = TRUE)
+boundary <- sf::read_sf(paste0(
+  "https://servicodados.ibge.gov.br/api/v3/malhas/municipios/2611101",
+  "?formato=application/vnd.geo%2Bjson&qualidade=maxima"
+)) |>
+  sf::st_transform(4674)
+
+imagery <- maptiles::get_tiles(
+  sf::st_buffer(boundary, 3000),
+  provider = "Esri.WorldImagery", zoom = 10, crop = TRUE
+)
 
 ggplot() +
   tidyterra::geom_spatraster_rgb(data = imagery, maxcell = 2e6) +
@@ -338,6 +348,7 @@ ggplot() +
     data = valid, aes(fill = size_class, colour = size_class),
     linewidth = 0.15, alpha = 0.55
   ) +
+  geom_sf(data = boundary, fill = NA, colour = "white", linewidth = 0.9) +
   scale_fill_manual(
     values = c(small = "#ffe066", medium = "#ff922b", large = "#e03131"),
     labels = c("Pequeno (até 4 módulos fiscais)", "Médio (4 a 15)", "Grande (acima de 15)"),
@@ -346,8 +357,8 @@ ggplot() +
   coord_sf(expand = FALSE) +
   labs(
     title = "Imóveis declarados no CAR em Petrolina, Pernambuco",
-    subtitle = paste(nrow(valid), "cadastros ativos ou pendentes, por porte"),
-    caption = "Fonte: SFB/Sicar, via carbr. Imagem: Esri World Imagery (Esri e colaboradores)."
+    subtitle = paste(nrow(valid), "cadastros ativos ou pendentes, por porte. Em branco, o limite municipal."),
+    caption = "Fontes: SFB/Sicar, via carbr; malha municipal do IBGE. Imagem: Esri World Imagery."
   ) +
   theme_void() +
   theme(
@@ -357,8 +368,8 @@ ggplot() +
 ```
 
 <div class="figure" style="text-align: center">
-<img src="carbr-petrolina-1.png" alt="Mapa dos imóveis declarados no CAR em Petrolina sobre imagem de satélite, coloridos por porte."  />
-<p class="caption">plot of chunk petrolina</p>
+<img src="carbr-mapa-petrolina-1.png" alt="Mapa dos imóveis declarados no CAR em Petrolina sobre imagem de satélite, coloridos por porte, com o limite municipal."  />
+<p class="caption">plot of chunk mapa-petrolina</p>
 </div>
 
 Os filtros combinam. Só os imóveis grandes com cadastro ativo:
