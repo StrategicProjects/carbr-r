@@ -66,3 +66,6 @@ Authors:
 
 - Diogo Bezerra <diogo.bezerra@ufpe.br>
   ([ORCID](https://orcid.org/0000-0002-1216-8674))
+
+- Hortênsia Nunes Braz de Oliveira
+  ([ORCID](https://orcid.org/0009-0002-3638-7211))

@@ -14,18 +14,22 @@
 
 - **Diogo Bezerra**. Author. [](https://orcid.org/0000-0002-1216-8674)
 
+- **Hortênsia Nunes Braz de Oliveira**. Author.
+  [](https://orcid.org/0009-0002-3638-7211)
+
 ## Citation
 
 Source:
 [`DESCRIPTION`](https://github.com/StrategicProjects/carbr-r/blob/main/DESCRIPTION)
 
-Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D (2026). *carbr:
-Access the Rural Environmental Registry of Brazil ('CAR')*. R package
-version 0.1.0, <https://github.com/StrategicProjects/carbr-r>.
+Leite A, Wasiliew M, Vasconcelos H, Amorim C, Bezerra D, Nunes Braz de
+Oliveira H (2026). *carbr: Access the Rural Environmental Registry of
+Brazil ('CAR')*. R package version 0.1.0,
+<https://github.com/StrategicProjects/carbr-r>.
 
     @Manual{,
       title = {carbr: Access the Rural Environmental Registry of Brazil ('CAR')},
-      author = {André Leite and Marcos Wasiliew and Hugo Vasconcelos and Carlos Amorim and Diogo Bezerra},
+      author = {André Leite and Marcos Wasiliew and Hugo Vasconcelos and Carlos Amorim and Diogo Bezerra and Hortênsia {Nunes Braz de Oliveira}},
       year = {2026},
       note = {R package version 0.1.0},
       url = {https://github.com/StrategicProjects/carbr-r},
