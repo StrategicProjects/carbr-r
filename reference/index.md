@@ -26,6 +26,14 @@ O que está publicado e o que cada coluna significa.
 - [`car_tbl()`](https://castlaboratory.github.io/carbr-r/reference/car_tbl.md)
   : Tabela preguiçosa dos imóveis
 
+## Qualidade do cadastro
+
+Sobreposição entre imóveis e área fora do município declarado.
+
+- [`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+  [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+  : Indicadores de qualidade do cadastro
+
 ## Citar
 
 - [`car_cite()`](https://castlaboratory.github.io/carbr-r/reference/car_cite.md)

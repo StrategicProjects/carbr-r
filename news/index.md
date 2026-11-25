@@ -2,6 +2,11 @@
 
 ## carbr (development version)
 
+- [`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+  e
+  [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md):
+  indicadores de qualidade do cadastro, por imóvel e por município
+  (sobreposição com outros imóveis e área fora do município declarado).
 - [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md):
   verifica uma lista de códigos de imóvel de uma vez e resume o que
   consta de cada um (`ok`, `attention`, `blocked`, `not_found`,
