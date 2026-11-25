@@ -1,0 +1,9 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  carbr: carbr.html
+last_built: 2026-11-25T00:53Z
+urls:
+  reference: https://strategicprojects.github.io/carbr-r/reference
+  article: https://strategicprojects.github.io/carbr-r/articles
