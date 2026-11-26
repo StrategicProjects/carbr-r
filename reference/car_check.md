@@ -28,7 +28,8 @@ Um tibble com uma linha por código, na ordem dada: `property_code`,
 para os imóveis não cancelados, `indigenous_share`,
 `strict_protection_share`, `sustainable_use_share` (parcelas da área, de
 0 a 1), `protected_area` (os nomes das áreas sobrepostas),
-`embargo_count`, `embargo_share` e `public_forest_share`.
+`embargo_count`, `embargo_share`, `public_forest_share`,
+`quilombola_share` e `sigef_share`.
 
 ## Details
 
@@ -39,8 +40,9 @@ oficial:
 
 - `"attention"`: cadastro pendente, analisado com notificação ainda sem
   resposta do declarante, com mais de 1% da área sobre terra indígena,
-  unidade de conservação de proteção integral ou floresta pública não
-  destinada, ou com embargo ambiental ativo do Ibama;
+  unidade de conservação de proteção integral, floresta pública não
+  destinada ou território quilombola georreferenciado no Sigef, ou com
+  embargo ambiental ativo do Ibama;
 
 - `"blocked"`: cadastro cancelado ou suspenso;
 
@@ -57,9 +59,12 @@ imóveis privados. Os embargos são os do Ibama (dados abertos, termos não
 cancelados e sem desembargo), localizados pelo polígono ou pelo ponto do
 termo; não entram embargos estaduais nem do ICMBio. As florestas
 públicas não destinadas ("tipo B") são as do Cadastro Nacional de
-Florestas Públicas. A verificação não cobre os demais impedimentos do
-crédito rural (territórios quilombolas, supressão de vegetação, trabalho
-análogo à escravidão) e não substitui a consulta oficial ao Sicar.
+Florestas Públicas. Os territórios quilombolas são só os já
+georreferenciados no Sigef, do Incra: a camada completa não está
+publicada hoje, então a ausência de alerta não garante que o imóvel
+esteja fora de um território quilombola. A verificação não cobre a
+supressão de vegetação nem o trabalho análogo à escravidão, e não
+substitui a consulta oficial ao Sicar.
 
 ## Examples
 

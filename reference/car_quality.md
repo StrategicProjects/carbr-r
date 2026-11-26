@@ -57,7 +57,18 @@ e unidades de conservação vêm vazias se a publicação ainda não as traz.
 
 - `public_forest_share`: que parcela fica dentro de florestas públicas
   não destinadas ("tipo B"), pelo Cadastro Nacional de Florestas
-  Públicas, do Serviço Florestal.
+  Públicas, do Serviço Florestal;
+
+- `sigef_count` e `sigef_share`: quantas parcelas georreferenciadas no
+  Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem.
+  Perto de 1 quer dizer que o perímetro declarado no CAR coincide com um
+  georreferenciamento aprovado pelo Incra;
+
+- `quilombola_share` e `settlement_share`: que parcela cai em parcelas
+  do Sigef cuja natureza é território quilombola ou assentamento. **A
+  cobertura é parcial**: só os territórios já georreferenciados no
+  Sigef; a camada completa de territórios quilombolas não está publicada
+  pelo Incra hoje.
 
 `car_quality()` traz os indicadores por imóvel; `car_quality_summary()`,
 o resumo por município: imóveis não cancelados (`properties`), quantos
@@ -70,7 +81,10 @@ indígenas (`indigenous`), unidades de proteção integral
 imóveis têm mais de 1% da área dentro delas e quantos hectares (`*_ha`);
 quantos imóveis têm embargo ativo do Ibama (`embargoed`) e os hectares
 embargados (`embargo_ha`); e quantos têm mais de 1% da área em floresta
-pública tipo B (`public_forest`, `public_forest_ha`).
+pública tipo B (`public_forest`, `public_forest_ha`). Do Sigef:
+`certified` (imóveis com mais da metade da área em parcelas
+georreferenciadas), `sigef_ha`, `quilombola` e `settlement` (imóveis com
+mais de 1% em território quilombola ou em assentamento do Sigef).
 
 Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 declarado duas vezes e lote dentro de assentamento; a comparação é só

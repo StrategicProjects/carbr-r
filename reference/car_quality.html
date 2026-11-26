@@ -99,7 +99,16 @@ termos que têm o polígono da área; os demais contam pelo ponto de
 referência);</p></li>
 <li><p><code>public_forest_share</code>: que parcela fica dentro de florestas públicas não
 destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas, do
-Serviço Florestal.</p></li>
+Serviço Florestal;</p></li>
+<li><p><code>sigef_count</code> e <code>sigef_share</code>: quantas parcelas georreferenciadas no
+Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem. Perto
+de 1 quer dizer que o perímetro declarado no CAR coincide com um
+georreferenciamento aprovado pelo Incra;</p></li>
+<li><p><code>quilombola_share</code> e <code>settlement_share</code>: que parcela cai em parcelas do
+Sigef cuja natureza é território quilombola ou assentamento. <strong>A
+cobertura é parcial</strong>: só os territórios já georreferenciados no Sigef;
+a camada completa de territórios quilombolas não está publicada pelo
+Incra hoje.</p></li>
 </ul><p><code>car_quality()</code> traz os indicadores por imóvel; <code>car_quality_summary()</code>,
 o resumo por município: imóveis não cancelados (<code>properties</code>), quantos
 têm sobreposição acima de 1% (<code>overlapping</code>) e de 50% da área
@@ -111,7 +120,10 @@ indígenas (<code>indigenous</code>), unidades de proteção integral
 imóveis têm mais de 1% da área dentro delas e quantos hectares (<code>*_ha</code>);
 quantos imóveis têm embargo ativo do Ibama (<code>embargoed</code>) e os hectares
 embargados (<code>embargo_ha</code>); e quantos têm mais de 1% da área em floresta
-pública tipo B (<code>public_forest</code>, <code>public_forest_ha</code>).</p>
+pública tipo B (<code>public_forest</code>, <code>public_forest_ha</code>). Do Sigef:
+<code>certified</code> (imóveis com mais da metade da área em parcelas
+georreferenciadas), <code>sigef_ha</code>, <code>quilombola</code> e <code>settlement</code> (imóveis com
+mais de 1% em território quilombola ou em assentamento do Sigef).</p>
 <p>Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 declarado duas vezes e lote dentro de assentamento; a comparação é só
 entre imóveis do mesmo estado. Estar em unidade de uso sustentável também

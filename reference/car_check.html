@@ -80,7 +80,8 @@ município, de modo que uma lista grande lê poucos trechos de cada arquivo.</p>
 para os imóveis não cancelados, <code>indigenous_share</code>,
 <code>strict_protection_share</code>, <code>sustainable_use_share</code> (parcelas da área, de
 0 a 1), <code>protected_area</code> (os nomes das áreas sobrepostas),
-<code>embargo_count</code>, <code>embargo_share</code> e <code>public_forest_share</code>.</p>
+<code>embargo_count</code>, <code>embargo_share</code>, <code>public_forest_share</code>,
+<code>quilombola_share</code> e <code>sigef_share</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -88,8 +89,9 @@ para os imóveis não cancelados, <code>indigenous_share</code>,
 oficial:</p><ul><li><p><code>"ok"</code>: cadastro ativo, sem notificação pendente;</p></li>
 <li><p><code>"attention"</code>: cadastro pendente, analisado com notificação ainda sem
 resposta do declarante, com mais de 1% da área sobre terra indígena,
-unidade de conservação de proteção integral ou floresta pública não
-destinada, ou com embargo ambiental ativo do Ibama;</p></li>
+unidade de conservação de proteção integral, floresta pública não
+destinada ou território quilombola georreferenciado no Sigef, ou com
+embargo ambiental ativo do Ibama;</p></li>
 <li><p><code>"blocked"</code>: cadastro cancelado ou suspenso;</p></li>
 <li><p><code>"not_found"</code>: código que não está na publicação (pode ter sido
 cadastrado depois da última atualização);</p></li>
@@ -102,9 +104,12 @@ imóveis privados. Os embargos são os do Ibama (dados abertos, termos não
 cancelados e sem desembargo), localizados pelo polígono ou pelo ponto do
 termo; não entram embargos estaduais nem do ICMBio. As florestas públicas
 não destinadas ("tipo B") são as do Cadastro Nacional de Florestas
-Públicas. A verificação não cobre os demais impedimentos do crédito rural
-(territórios quilombolas, supressão de vegetação, trabalho análogo à
-escravidão) e não substitui a consulta oficial ao Sicar.</p>
+Públicas. Os territórios quilombolas são só os já georreferenciados no
+Sigef, do Incra: a camada completa não está publicada hoje, então a
+ausência de alerta não garante que o imóvel esteja fora de um território
+quilombola. A verificação não cobre a supressão de vegetação nem o
+trabalho análogo à escravidão, e não substitui a consulta oficial ao
+Sicar.</p>
     </div>
 
     <div class="section level2">
