@@ -175,7 +175,7 @@ test_that("car_check() classifies a batch of codes, one row per code, in the giv
     "property_code", "check", "note", "stage", "status", "condition", "property_type",
     "size_class", "area_ha", "fiscal_modules", "state", "municipality", "created_at",
     "indigenous_share", "strict_protection_share", "sustainable_use_share", "protected_area",
-    "embargo_count", "embargo_share"
+    "embargo_count", "embargo_share", "public_forest_share"
   ))
   expect_equal(nrow(car_check(character())), 0)
 })
@@ -200,7 +200,8 @@ test_that("quality indicators come per property and per municipality", {
   expect_named(q, c(
     "property_code", "municipality_code", "overlap_count", "overlap_share", "outside_share",
     "indigenous_share", "strict_protection_share", "sustainable_use_share",
-    "indigenous_land", "conservation_unit", "conservation_category", "embargo_count", "embargo_share"
+    "indigenous_land", "conservation_unit", "conservation_category", "embargo_count", "embargo_share",
+    "public_forest_share"
   ))
   expect_equal(nrow(q), 5)
   town <- car_quality("PE", municipality = "petrolina")
@@ -220,6 +221,7 @@ test_that("quality indicators come per property and per municipality", {
   expect_equal(s$strict_protection, c(1L, 0L))
   expect_equal(s$sustainable_use, c(1L, 0L))
   expect_equal(s$embargoed, c(0L, 1L))
+  expect_equal(s$public_forest, c(1L, 0L))
   expect_equal(nrow(car_quality_summary()), 2)
 })
 
@@ -234,6 +236,7 @@ test_that("the check flags indigenous lands and strict protection units", {
   # A pending one keeps its own reason and gains the park.
   expect_match(out$note[3], "Cadastro pendente.", fixed = TRUE)
   expect_match(out$note[3], "integral (Parque Teste) em 30% da", fixed = TRUE)
+  expect_match(out$note[3], "(tipo B) em 25% da", fixed = TRUE)
   # Sustainable use is reported, but does not change the result.
   expect_match(out$note[4], "(APA: APA Teste), em toda a", fixed = TRUE)
   expect_equal(out$protected_area, c(NA, "Terra Teste", "Parque Teste", "APA Teste"))

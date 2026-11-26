@@ -433,9 +433,9 @@ car_stage <- function(condition) {
 #'
 #' * `"ok"`: cadastro ativo, sem notificação pendente;
 #' * `"attention"`: cadastro pendente, analisado com notificação ainda sem
-#'   resposta do declarante, com mais de 1% da área sobre terra indígena ou
-#'   unidade de conservação de proteção integral, ou com embargo ambiental
-#'   ativo do Ibama;
+#'   resposta do declarante, com mais de 1% da área sobre terra indígena,
+#'   unidade de conservação de proteção integral ou floresta pública não
+#'   destinada, ou com embargo ambiental ativo do Ibama;
 #' * `"blocked"`: cadastro cancelado ou suspenso;
 #' * `"not_found"`: código que não está na publicação (pode ter sido
 #'   cadastrado depois da última atualização);
@@ -447,10 +447,11 @@ car_stage <- function(condition) {
 #' resultado: áreas de proteção ambiental e reservas particulares admitem
 #' imóveis privados. Os embargos são os do Ibama (dados abertos, termos não
 #' cancelados e sem desembargo), localizados pelo polígono ou pelo ponto do
-#' termo; não entram embargos estaduais nem do ICMBio. A verificação não
-#' cobre os demais impedimentos do crédito rural (territórios quilombolas,
-#' florestas públicas não destinadas, supressão de vegetação, trabalho
-#' análogo à escravidão) e não substitui a consulta oficial ao Sicar.
+#' termo; não entram embargos estaduais nem do ICMBio. As florestas públicas
+#' não destinadas ("tipo B") são as do Cadastro Nacional de Florestas
+#' Públicas. A verificação não cobre os demais impedimentos do crédito rural
+#' (territórios quilombolas, supressão de vegetação, trabalho análogo à
+#' escravidão) e não substitui a consulta oficial ao Sicar.
 #'
 #' @param code Códigos de imóvel no CAR (`UF-0000000-identificador`).
 #' @returns Um tibble com uma linha por código, na ordem dada: `property_code`,
@@ -461,7 +462,7 @@ car_stage <- function(condition) {
 #'   para os imóveis não cancelados, `indigenous_share`,
 #'   `strict_protection_share`, `sustainable_use_share` (parcelas da área, de
 #'   0 a 1), `protected_area` (os nomes das áreas sobrepostas),
-#'   `embargo_count` e `embargo_share`.
+#'   `embargo_count`, `embargo_share` e `public_forest_share`.
 #' @examplesIf interactive()
 #' car_check(c(
 #'   "PE-2611101-588BC484570D440484F527F07DF5AFFA",
@@ -548,7 +549,11 @@ car_check <- function(code) {
       paste0(" H\u00e1 ", embargoes, " embargos ambientais ativos do Ibama")),
     ifelse(covered >= 0.01, paste0(", sobre ", car_percent(covered), "."), " no im\u00f3vel.")
   ), ""))
-  alert <- (ti | strict | embargoes > 0) & out$check == "ok"
+  forest <- share(out$public_forest_share)
+  extra <- paste0(extra, ifelse(forest >= 0.01, paste0(
+    " Sobrep\u00f5e floresta p\u00fablica n\u00e3o destinada (tipo B) em ", car_percent(forest), "."
+  ), ""))
+  alert <- (ti | strict | embargoes > 0 | forest >= 0.01) & out$check == "ok"
   out$note <- trimws(paste0(ifelse(alert, "", out$note), extra))
   out$check[alert] <- "attention"
   out$protected_area <- mapply(function(a, b, c, d) {
@@ -558,7 +563,7 @@ car_check <- function(code) {
   out[c(
     "property_code", "check", "note", "stage", setdiff(columns, "property_code"),
     "indigenous_share", "strict_protection_share", "sustainable_use_share", "protected_area",
-    "embargo_count", "embargo_share"
+    "embargo_count", "embargo_share", "public_forest_share"
   )]
 }
 
@@ -574,7 +579,8 @@ car_percent <- function(share) {
 car_check_quality <- function(towns) {
   columns <- c(
     "property_code", "indigenous_share", "strict_protection_share", "sustainable_use_share",
-    "indigenous_land", "conservation_unit", "conservation_category", "embargo_count", "embargo_share"
+    "indigenous_land", "conservation_unit", "conservation_category", "embargo_count", "embargo_share",
+    "public_forest_share"
   )
   out <- car_empty_quality()[columns]
   for (uf in unique(substr(names(towns), 1, 2))) {
@@ -593,7 +599,7 @@ car_empty_quality <- function() {
     overlap_count = integer(), overlap_share = double(), outside_share = double(),
     indigenous_share = double(), strict_protection_share = double(), sustainable_use_share = double(),
     indigenous_land = character(), conservation_unit = character(), conservation_category = character(),
-    embargo_count = integer(), embargo_share = double()
+    embargo_count = integer(), embargo_share = double(), public_forest_share = double()
   )
 }
 
@@ -624,7 +630,10 @@ car_like <- function(out, empty) {
 #' * `embargo_count` e `embargo_share`: quantos embargos ambientais ativos do
 #'   Ibama alcançam o imóvel e que parcela da área está embargada (só os
 #'   termos que têm o polígono da área; os demais contam pelo ponto de
-#'   referência).
+#'   referência);
+#' * `public_forest_share`: que parcela fica dentro de florestas públicas não
+#'   destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas, do
+#'   Serviço Florestal.
 #'
 #' `car_quality()` traz os indicadores por imóvel; `car_quality_summary()`,
 #' o resumo por município: imóveis não cancelados (`properties`), quantos
@@ -635,8 +644,9 @@ car_like <- function(out, empty) {
 #' indígenas (`indigenous`), unidades de proteção integral
 #' (`strict_protection`) e de uso sustentável (`sustainable_use`), quantos
 #' imóveis têm mais de 1% da área dentro delas e quantos hectares (`*_ha`);
-#' e quantos imóveis têm embargo ativo do Ibama (`embargoed`) e os hectares
-#' embargados (`embargo_ha`).
+#' quantos imóveis têm embargo ativo do Ibama (`embargoed`) e os hectares
+#' embargados (`embargo_ha`); e quantos têm mais de 1% da área em floresta
+#' pública tipo B (`public_forest`, `public_forest_ha`).
 #'
 #' Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 #' declarado duas vezes e lote dentro de assentamento; a comparação é só
@@ -699,7 +709,8 @@ car_quality_summary <- function(state = NULL) {
     indigenous = integer(), indigenous_ha = double(),
     strict_protection = integer(), strict_protection_ha = double(),
     sustainable_use = integer(), sustainable_use_ha = double(),
-    embargoed = integer(), embargo_ha = double()
+    embargoed = integer(), embargo_ha = double(),
+    public_forest = integer(), public_forest_ha = double()
   )
   cat <- car_catalog_json()
   if (is.null(cat)) {

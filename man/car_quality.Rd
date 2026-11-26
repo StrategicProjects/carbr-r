@@ -44,7 +44,10 @@ se houver);
 \item \code{embargo_count} e \code{embargo_share}: quantos embargos ambientais ativos do
 Ibama alcançam o imóvel e que parcela da área está embargada (só os
 termos que têm o polígono da área; os demais contam pelo ponto de
-referência).
+referência);
+\item \code{public_forest_share}: que parcela fica dentro de florestas públicas não
+destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas, do
+Serviço Florestal.
 }
 
 \code{car_quality()} traz os indicadores por imóvel; \code{car_quality_summary()},
@@ -56,8 +59,9 @@ dois lados de cada par), e quantos imóveis (\code{outside_half}) e hectares
 indígenas (\code{indigenous}), unidades de proteção integral
 (\code{strict_protection}) e de uso sustentável (\code{sustainable_use}), quantos
 imóveis têm mais de 1\% da área dentro delas e quantos hectares (\verb{*_ha});
-e quantos imóveis têm embargo ativo do Ibama (\code{embargoed}) e os hectares
-embargados (\code{embargo_ha}).
+quantos imóveis têm embargo ativo do Ibama (\code{embargoed}) e os hectares
+embargados (\code{embargo_ha}); e quantos têm mais de 1\% da área em floresta
+pública tipo B (\code{public_forest}, \code{public_forest_ha}).
 
 Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 declarado duas vezes e lote dentro de assentamento; a comparação é só

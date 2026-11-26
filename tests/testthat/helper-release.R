@@ -81,7 +81,9 @@ release_teste <- function(env = parent.frame()) {
     conservation_category = c(NA, NA, "Parque", "APA", NA),
     # The property in Recife (the last one here) has two Ibama embargoes, over 40% of its area.
     embargo_count = c(0L, 0L, 0L, 0L, 2L),
-    embargo_share = c(0, 0, 0, 0, 0.4)
+    embargo_share = c(0, 0, 0, 0, 0.4),
+    # Property 3 (the one in the park) also has a quarter of its area on an undesignated public forest.
+    public_forest_share = c(0, 0, 0.25, 0, 0)
   )
   duckdb::duckdb_register(con, "quality", quality)
   dir.create(file.path(dir, "quality"))
@@ -105,7 +107,9 @@ release_teste <- function(env = parent.frame()) {
             count(*) FILTER (sustainable_use_share > 0.01) AS sustainable_use,
             sum(p.area_ha * sustainable_use_share) AS sustainable_use_ha,
             count(*) FILTER (embargo_count > 0) AS embargoed,
-            sum(p.area_ha * embargo_share) AS embargo_ha
+            sum(p.area_ha * embargo_share) AS embargo_ha,
+            count(*) FILTER (public_forest_share > 0.01) AS public_forest,
+            sum(p.area_ha * public_forest_share) AS public_forest_ha
           FROM quality q JOIN props p USING (property_code) GROUP BY ALL) TO '%s' (FORMAT parquet)", f_qm
   ))
   dir.create(file.path(dir, "typology"))
