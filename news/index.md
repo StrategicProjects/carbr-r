@@ -9,6 +9,8 @@
   e
   [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
   trazem as colunas novas.
+- O mesmo para florestas públicas não destinadas (“tipo B”), pelo
+  Cadastro Nacional de Florestas Públicas (`public_forest_share`).
 - [`car_typology()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
   e
   [`car_typology_groups()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md):

@@ -96,7 +96,10 @@ se houver);</p></li>
 <li><p><code>embargo_count</code> e <code>embargo_share</code>: quantos embargos ambientais ativos do
 Ibama alcançam o imóvel e que parcela da área está embargada (só os
 termos que têm o polígono da área; os demais contam pelo ponto de
-referência).</p></li>
+referência);</p></li>
+<li><p><code>public_forest_share</code>: que parcela fica dentro de florestas públicas não
+destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas, do
+Serviço Florestal.</p></li>
 </ul><p><code>car_quality()</code> traz os indicadores por imóvel; <code>car_quality_summary()</code>,
 o resumo por município: imóveis não cancelados (<code>properties</code>), quantos
 têm sobreposição acima de 1% (<code>overlapping</code>) e de 50% da área
@@ -106,8 +109,9 @@ dois lados de cada par), e quantos imóveis (<code>outside_half</code>) e hectar
 indígenas (<code>indigenous</code>), unidades de proteção integral
 (<code>strict_protection</code>) e de uso sustentável (<code>sustainable_use</code>), quantos
 imóveis têm mais de 1% da área dentro delas e quantos hectares (<code>*_ha</code>);
-e quantos imóveis têm embargo ativo do Ibama (<code>embargoed</code>) e os hectares
-embargados (<code>embargo_ha</code>).</p>
+quantos imóveis têm embargo ativo do Ibama (<code>embargoed</code>) e os hectares
+embargados (<code>embargo_ha</code>); e quantos têm mais de 1% da área em floresta
+pública tipo B (<code>public_forest</code>, <code>public_forest_ha</code>).</p>
 <p>Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 declarado duas vezes e lote dentro de assentamento; a comparação é só
 entre imóveis do mesmo estado. Estar em unidade de uso sustentável também
