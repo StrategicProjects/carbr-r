@@ -60,9 +60,11 @@ e unidades de conservação vêm vazias se a publicação ainda não as traz.
   Públicas, do Serviço Florestal;
 
 - `sigef_count` e `sigef_share`: quantas parcelas georreferenciadas no
-  Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem.
-  Perto de 1 quer dizer que o perímetro declarado no CAR coincide com um
-  georreferenciamento aprovado pelo Incra;
+  Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem,
+  contando só parcelas particulares e lotes de assentamento (glebas
+  públicas e áreas protegidas, que também estão no Sigef, ficam de
+  fora). Perto de 1 quer dizer que o perímetro declarado no CAR coincide
+  com um georreferenciamento aprovado pelo Incra;
 
 - `quilombola_share` e `settlement_share`: que parcela cai em parcelas
   do Sigef cuja natureza é território quilombola ou assentamento. **A
