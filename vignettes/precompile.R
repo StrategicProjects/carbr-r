@@ -9,7 +9,7 @@
 # Usage: Rscript vignettes/precompile.R [name ...]
 
 vignettes <- commandArgs(trailingOnly = TRUE)
-if (length(vignettes) == 0) vignettes <- c("carbr", "inconsistencias", "analise")
+if (length(vignettes) == 0) vignettes <- c("carbr", "inconsistencias", "analise", "credito")
 
 pkgload::load_all(quiet = TRUE)
 invisible(car_catalog(refresh = TRUE))

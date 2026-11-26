@@ -1,5 +1,6 @@
 # carbr (development version)
 
+* Guia novo, "Triagem para crédito e conformidade", e seção sobre o Sigef no guia de inconsistências.
 * `car_check()` passa a apontar embargos ambientais ativos do Ibama (`embargo_count`, `embargo_share`),
   que levam o resultado a `"attention"`; `car_quality()` e `car_quality_summary()` trazem as colunas novas.
 * O mesmo para florestas públicas não destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas

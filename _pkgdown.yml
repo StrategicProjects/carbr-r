@@ -25,6 +25,8 @@ navbar:
         href: articles/inconsistencias.html
       - text: Onde a análise está parada
         href: articles/analise.html
+      - text: Triagem para crédito e conformidade
+        href: articles/credito.html
     news:
       text: Novidades
       href: news/index.html
@@ -75,3 +77,4 @@ articles:
   - carbr
   - inconsistencias
   - analise
+  - credito

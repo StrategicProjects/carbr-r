@@ -52,7 +52,9 @@ car_properties("PE", status = "pending", geometry = FALSE)
 
 car_at(lon = -40.5, lat = -9.2)     # que imóveis estão declarados neste ponto?
 car_property("PE-2611101-588BC484570D440484F527F07DF5AFFA")
-car_check(codigos)                  # triagem de uma lista de códigos
+car_check(codigos)                  # triagem: situação, áreas protegidas, embargos, florestas públicas
+car_quality_summary()               # indicadores por município, o país inteiro
+car_typology()                      # o perfil de cada município
 
 # Qualquer outra consulta, com dplyr, direto no arquivo remoto
 car_tbl("PE") |>
@@ -68,18 +70,19 @@ car_tbl("PE") |>
 | `car_municipalities()` | Resumo por município |
 | `car_properties()` | Imóveis de uma UF, com filtros aplicados antes da leitura |
 | `car_property()` | Um imóvel pelo código |
-| `car_check()` | Verificação de uma lista de códigos de uma vez |
+| `car_check()` | Triagem de uma lista de códigos: situação, terras indígenas, unidades de conservação, embargos, florestas públicas |
 | `car_at()` | Imóveis que contêm um ponto |
 | `car_typology()`, `car_typology_groups()` | Tipologia dos municípios em cinco grupos |
-| `car_quality()`, `car_quality_summary()` | Indicadores de qualidade: sobreposição e área fora do município |
+| `car_quality()`, `car_quality_summary()` | Indicadores por imóvel e por município: sobreposição, área fora do município, áreas protegidas, embargos do Ibama e parcelas do Sigef |
 | `car_tbl()` | Tabela preguiçosa para consultas com `dplyr` |
 | `car_cite()` | Como citar os dados |
 
 ## Guias
 
 - [Primeiros passos](https://castlaboratory.github.io/carbr-r/articles/carbr.html)
-- [Inconsistências do cadastro](https://castlaboratory.github.io/carbr-r/articles/inconsistencias.html): sobreposições, imóveis fora do município, área declarada maior que o território.
-- [Onde a análise está parada](https://castlaboratory.github.io/carbr-r/articles/analise.html): as etapas da análise por UF e quem aguarda resposta à notificação.
+- [Inconsistências do cadastro](https://castlaboratory.github.io/carbr-r/articles/inconsistencias.html): sobreposições entre imóveis, terras indígenas e unidades de conservação, o confronto com o Sigef do Incra e a área declarada maior que o território.
+- [Onde a análise está parada](https://castlaboratory.github.io/carbr-r/articles/analise.html): as etapas da análise por UF, quem aguarda resposta à notificação e a tipologia dos municípios.
+- [Triagem para crédito e conformidade](https://castlaboratory.github.io/carbr-r/articles/credito.html): a conferência em lote dos impedimentos do crédito rural, com os mapas de embargos e de florestas públicas.
 
 ## Os dados
 

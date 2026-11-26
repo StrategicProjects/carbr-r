@@ -215,6 +215,71 @@ O sinal vem de perímetros autodeclarados cruzados com limites oficiais, e
 não é uma conclusão sobre o imóvel: há terras indígenas ainda em estudo, e
 cadastros anteriores à criação de uma unidade de conservação.
 
+## O perímetro confere com o Incra?
+
+O CAR é declarado pelo próprio produtor. O Sigef, do Incra, guarda outra
+coisa: perímetros medidos por um profissional e aprovados. Cruzar os dois
+diz quanto do que foi declarado coincide com um georreferenciamento oficial.
+`sigef_share` é a parcela da área do imóvel coberta por parcelas particulares
+ou lotes de assentamento do Sigef.
+
+```{r}
+sigef <- quality |>
+  group_by(state) |>
+  summarise(properties = sum(properties), certified = sum(certified)) |>
+  mutate(share = round(100 * certified / properties, 1)) |>
+  arrange(desc(share))
+
+sigef |> summarise(properties = sum(properties), certified = sum(certified))
+```
+
+```{r sigef, fig.height = 6, fig.alt = "Mapa do Brasil com a parcela dos imóveis de cada UF que têm metade ou mais da área em parcelas do Sigef."}
+states |>
+  mutate(state = ufs[codarea]) |>
+  left_join(sigef, by = "state") |>
+  ggplot() +
+  geom_sf(aes(fill = share), colour = "white", linewidth = 0.2) +
+  scale_fill_gradient(
+    low = "#e7f5ff", high = "#1864ab", limits = c(0, NA),
+    labels = function(x) paste0(x, "%"), name = "Imóveis com metade\nou mais da área\nno Sigef"
+  ) +
+  labs(
+    title = "Imóveis do CAR com perímetro georreferenciado no Incra",
+    caption = "Fontes: SFB/Sicar, via carbr; Incra, Sigef; malha do IBGE."
+  ) +
+  theme_void() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+No Centro-Oeste e em parte da Amazônia, metade dos cadastros tem o perímetro
+conferido; no Nordeste, menos de um em cada dez. Dentro de um estado, a
+distribuição é de extremos: ou o imóvel não passou pelo Sigef, ou coincide
+quase todo.
+
+```{r sigef-classes, fig.height = 3.2, fig.alt = "Barras com a distribuição dos imóveis de Mato Grosso por faixa de cobertura no Sigef."}
+car_quality("MT") |>
+  mutate(class = cut(
+    sigef_share, c(-Inf, 0.01, 0.5, 0.95, Inf),
+    c("Fora do Sigef", "De 1% a 50%", "De 50% a 95%", "Mais de 95%")
+  )) |>
+  count(class) |>
+  mutate(share = 100 * n / sum(n)) |>
+  ggplot(aes(share, class)) +
+  geom_col(fill = "#1864ab") +
+  geom_text(aes(label = paste0(round(share), "%")), hjust = -0.2, size = 3.4) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(
+    title = "Mato Grosso: quanto de cada imóvel do CAR está no Sigef",
+    x = "% dos imóveis não cancelados", y = NULL
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"), panel.grid.major.y = element_blank())
+```
+
+Um imóvel entre 1% e 95% merece atenção: o CAR e o Sigef discordam sobre
+onde ele fica. As glebas públicas, as unidades de conservação e as terras
+indígenas que também estão no Sigef não entram nessa conta.
+
 ## O código diz um município, o cadastro diz outro
 
 O código do imóvel traz o município em que ele foi registrado
