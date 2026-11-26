@@ -2,6 +2,8 @@
 
 ## carbr (development version)
 
+- Guia novo, “Triagem para crédito e conformidade”, e seção sobre o
+  Sigef no guia de inconsistências.
 - [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md)
   passa a apontar embargos ambientais ativos do Ibama (`embargo_count`,
   `embargo_share`), que levam o resultado a `"attention"`;

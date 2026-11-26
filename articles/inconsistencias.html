@@ -40,6 +40,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guias">
 <li><a class="dropdown-item" href="../articles/inconsistencias.html">Inconsistências do cadastro</a></li>
     <li><a class="dropdown-item" href="../articles/analise.html">Onde a análise está parada</a></li>
+    <li><a class="dropdown-item" href="../articles/credito.html">Triagem para crédito e conformidade</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Novidades</a></li>
@@ -154,7 +155,7 @@ município; somando por UF:</p>
 <span><span class="co">#&gt;    &lt;chr&gt;      &lt;int&gt;            &lt;int&gt;        &lt;int&gt;             &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt;  1 DF         20826            15830           10              76  </span></span>
 <span><span class="co">#&gt;  2 AC         57680            36265          294              62.9</span></span>
-<span><span class="co">#&gt;  3 RR         27139            16801          215              61.9</span></span>
+<span><span class="co">#&gt;  3 RR         27145            16807          215              61.9</span></span>
 <span><span class="co">#&gt;  4 AP         16906             9983          192              59.1</span></span>
 <span><span class="co">#&gt;  5 MA        414258           238954         8819              57.7</span></span>
 <span><span class="co">#&gt;  6 MT        206064            97781         3397              47.5</span></span>
@@ -289,7 +290,7 @@ propriedade privada é normal.</p>
 <span><span class="co">#&gt; # A tibble: 1 × 4</span></span>
 <span><span class="co">#&gt;   properties indigenous strict_protection sustainable_use</span></span>
 <span><span class="co">#&gt;        &lt;int&gt;      &lt;int&gt;             &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1    8405790      13528             67009          554124</span></span></code></pre></div>
+<span><span class="co">#&gt; 1    8405796      13528             67009          554124</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">protected</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">indigenous</span>, <span class="va">strict_protection</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"kind"</span>, values_to <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -380,12 +381,85 @@ ainda em estudo, e cadastros anteriores à criação de uma unidade de
 conservação.</p>
 </div>
 <div class="section level2">
+<h2 id="o-perímetro-confere-com-o-incra">O perímetro confere com o Incra?<a class="anchor" aria-label="anchor" href="#o-per%C3%ADmetro-confere-com-o-incra"></a>
+</h2>
+<p>O CAR é declarado pelo próprio produtor. O Sigef, do Incra, guarda
+outra coisa: perímetros medidos por um profissional e aprovados. Cruzar
+os dois diz quanto do que foi declarado coincide com um
+georreferenciamento oficial. <code>sigef_share</code> é a parcela da
+área do imóvel coberta por parcelas particulares ou lotes de
+assentamento do Sigef.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sigef</span> <span class="op">&lt;-</span> <span class="va">quality</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>properties <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">properties</span><span class="op">)</span>, certified <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">certified</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>share <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="va">certified</span> <span class="op">/</span> <span class="va">properties</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">share</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sigef</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>properties <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">properties</span><span class="op">)</span>, certified <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">certified</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 2</span></span>
+<span><span class="co">#&gt;   properties certified</span></span>
+<span><span class="co">#&gt;        &lt;int&gt;     &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1    8405796   1825375</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">states</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">ufs</span><span class="op">[</span><span class="va">codarea</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">sigef</span>, by <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">share</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"white"</span>, linewidth <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient</a></span><span class="op">(</span></span>
+<span>    low <span class="op">=</span> <span class="st">"#e7f5ff"</span>, high <span class="op">=</span> <span class="st">"#1864ab"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>    labels <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"%"</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"Imóveis com metade\nou mais da área\nno Sigef"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Imóveis do CAR com perímetro georreferenciado no Incra"</span>,</span>
+<span>    caption <span class="op">=</span> <span class="st">"Fontes: SFB/Sicar, via carbr; Incra, Sigef; malha do IBGE."</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="inconsistencias-sigef-1.png" alt="Mapa do Brasil com a parcela dos imóveis de cada UF que têm metade ou mais da área em parcelas do Sigef."><p class="caption">
+plot of chunk sigef
+</p>
+</div>
+<p>No Centro-Oeste e em parte da Amazônia, metade dos cadastros tem o
+perímetro conferido; no Nordeste, menos de um em cada dez. Dentro de um
+estado, a distribuição é de extremos: ou o imóvel não passou pelo Sigef,
+ou coincide quase todo.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/car_quality.html">car_quality</a></span><span class="op">(</span><span class="st">"MT"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span></span>
+<span>    <span class="va">sigef_share</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0.01</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fora do Sigef"</span>, <span class="st">"De 1% a 50%"</span>, <span class="st">"De 50% a 95%"</span>, <span class="st">"Mais de 95%"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">class</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>share <span class="op">=</span> <span class="fl">100</span> <span class="op">*</span> <span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">share</span>, <span class="va">class</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"#1864ab"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">share</span><span class="op">)</span>, <span class="st">"%"</span><span class="op">)</span><span class="op">)</span>, hjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>, size <span class="op">=</span> <span class="fl">3.4</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span>mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Mato Grosso: quanto de cada imóvel do CAR está no Sigef"</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"% dos imóveis não cancelados"</span>, y <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span>, panel.grid.major.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="inconsistencias-sigef-classes-1.png" alt="Barras com a distribuição dos imóveis de Mato Grosso por faixa de cobertura no Sigef."><p class="caption">
+plot of chunk sigef-classes
+</p>
+</div>
+<p>Um imóvel entre 1% e 95% merece atenção: o CAR e o Sigef discordam
+sobre onde ele fica. As glebas públicas, as unidades de conservação e as
+terras indígenas que também estão no Sigef não entram nessa conta.</p>
+</div>
+<div class="section level2">
 <h2 id="o-código-diz-um-município-o-cadastro-diz-outro">O código diz um município, o cadastro diz outro<a class="anchor" aria-label="anchor" href="#o-c%C3%B3digo-diz-um-munic%C3%ADpio-o-cadastro-diz-outro"></a>
 </h2>
 <p>O código do imóvel traz o município em que ele foi registrado
 (<code>UF-0000000-…</code>). Em Pernambuco, comparando com a coluna
 <code>municipality_code</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">moved</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/car_tbl.html">car_tbl</a></span><span class="op">(</span><span class="st">"PE"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>code_municipality <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">property_code</span>, <span class="fl">4L</span>, <span class="fl">10L</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">code_municipality</span> <span class="op">!=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">municipality_code</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -414,7 +488,7 @@ municipal é atualizada —, mas é uma lista curta para conferir.</p>
 <p>Somando a área declarada dos imóveis de cada município e dividindo
 pela área do município na malha do IBGE, o resultado não deveria passar
 de 1. Passa em vários.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">ibge_mesh</span><span class="op">(</span><span class="st">"estados/PE?intrarregiao=municipio&amp;"</span><span class="op">)</span></span>
 <span><span class="va">mesh</span><span class="op">$</span><span class="va">territory_ha</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html" class="external-link">st_area</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1e4</span></span>
 <span></span>
@@ -440,7 +514,7 @@ de 1. Passa em vários.</p>
 <p>Em 35 dos 185 municípios de Pernambuco o cadastro soma mais área do
 que o município tem; em Catende, o dobro. A concentração na Zona da Mata
 sugere sobreposição sistemática entre imóveis, não erro isolado.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ratio</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span></span>
 <span>    <span class="va">ratio</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">0.8</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
@@ -470,7 +544,7 @@ plot of chunk razao
 </h2>
 <p>Com os perímetros, dá para ir ao detalhe. Os imóveis não cancelados
 de Petrolina e o limite do município:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">petrolina</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/car_properties.html">car_properties</a></span><span class="op">(</span><span class="st">"PE"</span>, municipality <span class="op">=</span> <span class="st">"Petrolina"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">status</span> <span class="op">!=</span> <span class="st">"cancelled"</span>, <span class="va">geometry_valid</span><span class="op">)</span></span>
 <span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">mesh</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">codarea</span> <span class="op">==</span> <span class="st">"2611101"</span><span class="op">)</span></span></code></pre></div>
@@ -482,7 +556,7 @@ planas para medir em hectares, sai a parcela da área que fica do lado de
 fora. Faixas estreitas na divisa são esperadas, porque o traçado do IBGE
 e o do declarante nunca coincidem; o sinal é o imóvel com mais da metade
 da área fora.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">utm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">petrolina</span>, <span class="fl">31984</span><span class="op">)</span></span>
 <span><span class="va">inside</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">utm</span>, <span class="va">property_code</span><span class="op">)</span>, <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">boundary</span>, <span class="fl">31984</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -499,7 +573,7 @@ da área fora.</p>
 <span><span class="co">#&gt;   properties outside_ha outside</span></span>
 <span><span class="co">#&gt;        &lt;int&gt;      &lt;dbl&gt;   &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1      10849      3359.      90</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">boundary</span>, fill <span class="op">=</span> <span class="st">"#f4f8f1"</span>, colour <span class="op">=</span> <span class="st">"#123a23"</span>, linewidth <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">petrolina</span>, <span class="op">!</span><span class="va">outside</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">"#8fbf9f"</span>, colour <span class="op">=</span> <span class="cn">NA</span>, alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
@@ -522,7 +596,7 @@ plot of chunk fora
 </h3>
 <p><code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_overlaps()</a></code> aponta, para cada imóvel, os outros com
 que ele divide área (tocar na divisa não conta):</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">overlaps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_overlaps</a></span><span class="op">(</span><span class="va">utm</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">summed_ha</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">geometry_ha</span><span class="op">)</span></span>
@@ -542,7 +616,7 @@ que ele divide área (tocar na divisa não conta):</p>
 <p>78% dos imóveis sobrepõem ao menos um vizinho, quase sempre em faixas
 estreitas na divisa. Somadas, as áreas passam em 41 mil hectares a área
 de fato coberta. Os casos que mais pesam são poucos:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">petrolina</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>neighbours <span class="op">=</span> <span class="va">overlaps</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -576,7 +650,7 @@ comunidades tradicionais, um único cadastro cobre muitas famílias, e um
 perímetro de milhares de hectares aparece com menos de quatro módulos.
 Em Pernambuco, os imóveis “pequenos” com mais de 440 hectares — quatro
 vezes o maior módulo fiscal do país:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/car_tbl.html">car_tbl</a></span><span class="op">(</span><span class="st">"PE"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">size_class</span> <span class="op">==</span> <span class="st">"small"</span>, <span class="va">area_ha</span> <span class="op">&gt;</span> <span class="fl">440</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">property_type</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -586,8 +660,8 @@ vezes o maior módulo fiscal do país:</p>
 <span><span class="co">#&gt;   property_type         properties area_ha</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;                      &lt;dbl&gt;   &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1 settlement                   432 651693.</span></span>
-<span><span class="co">#&gt; 2 rural_property                 1    926.</span></span>
-<span><span class="co">#&gt; 3 traditional_community         65 164138.</span></span></code></pre></div>
+<span><span class="co">#&gt; 2 traditional_community         65 164138.</span></span>
+<span><span class="co">#&gt; 3 rural_property                 1    926.</span></span></code></pre></div>
 <p>Quem conta “pequenos produtores” pelo porte deve separar o tipo do
 imóvel (<code>property_type</code>) antes.</p>
 </div>

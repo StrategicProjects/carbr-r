@@ -21,6 +21,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guias" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guias</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guias"><li><a class="dropdown-item" href="../articles/inconsistencias.html">Inconsistências do cadastro</a></li>
     <li><a class="dropdown-item" href="../articles/analise.html">Onde a análise está parada</a></li>
+    <li><a class="dropdown-item" href="../articles/credito.html">Triagem para crédito e conformidade</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Novidades</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -45,7 +46,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="carbr-development-version">carbr (development version)<a class="anchor" aria-label="anchor" href="#carbr-development-version"></a></h2>
-<ul><li>
+<ul><li>Guia novo, “Triagem para crédito e conformidade”, e seção sobre o Sigef no guia de inconsistências.</li>
+<li>
 <code><a href="../reference/car_check.html">car_check()</a></code> passa a apontar embargos ambientais ativos do Ibama (<code>embargo_count</code>, <code>embargo_share</code>), que levam o resultado a <code>"attention"</code>; <code><a href="../reference/car_quality.html">car_quality()</a></code> e <code><a href="../reference/car_quality.html">car_quality_summary()</a></code> trazem as colunas novas.</li>
 <li>O mesmo para florestas públicas não destinadas (“tipo B”), pelo Cadastro Nacional de Florestas Públicas (<code>public_forest_share</code>).</li>
 <li>Parcelas georreferenciadas do Sigef (Incra): <code>sigef_count</code> e <code>sigef_share</code> dizem quanto do imóvel coincide com um georreferenciamento aprovado; <code>quilombola_share</code> e <code>settlement_share</code>, quanto cai em território quilombola ou assentamento do Sigef. A triagem alerta para território quilombola, com cobertura parcial.</li>

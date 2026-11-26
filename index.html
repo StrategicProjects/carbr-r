@@ -45,6 +45,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guias">
 <li><a class="dropdown-item" href="articles/inconsistencias.html">Inconsistências do cadastro</a></li>
     <li><a class="dropdown-item" href="articles/analise.html">Onde a análise está parada</a></li>
+    <li><a class="dropdown-item" href="articles/credito.html">Triagem para crédito e conformidade</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Novidades</a></li>
@@ -108,7 +109,9 @@
 <span></span>
 <span><span class="fu"><a href="reference/car_at.html">car_at</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="op">-</span><span class="fl">40.5</span>, lat <span class="op">=</span> <span class="op">-</span><span class="fl">9.2</span><span class="op">)</span>     <span class="co"># que imóveis estão declarados neste ponto?</span></span>
 <span><span class="fu"><a href="reference/car_property.html">car_property</a></span><span class="op">(</span><span class="st">"PE-2611101-588BC484570D440484F527F07DF5AFFA"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/car_check.html">car_check</a></span><span class="op">(</span><span class="va">codigos</span><span class="op">)</span>                  <span class="co"># triagem de uma lista de códigos</span></span>
+<span><span class="fu"><a href="reference/car_check.html">car_check</a></span><span class="op">(</span><span class="va">codigos</span><span class="op">)</span>                  <span class="co"># triagem: situação, áreas protegidas, embargos, florestas públicas</span></span>
+<span><span class="fu"><a href="reference/car_quality.html">car_quality_summary</a></span><span class="op">(</span><span class="op">)</span>               <span class="co"># indicadores por município, o país inteiro</span></span>
+<span><span class="fu"><a href="reference/car_typology.html">car_typology</a></span><span class="op">(</span><span class="op">)</span>                      <span class="co"># o perfil de cada município</span></span>
 <span></span>
 <span><span class="co"># Qualquer outra consulta, com dplyr, direto no arquivo remoto</span></span>
 <span><span class="fu"><a href="reference/car_tbl.html">car_tbl</a></span><span class="op">(</span><span class="st">"PE"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -150,7 +153,7 @@
 </tr>
 <tr>
 <td><code><a href="reference/car_check.html">car_check()</a></code></td>
-<td>Verificação de uma lista de códigos de uma vez</td>
+<td>Triagem de uma lista de códigos: situação, terras indígenas, unidades de conservação, embargos, florestas públicas</td>
 </tr>
 <tr>
 <td><code><a href="reference/car_at.html">car_at()</a></code></td>
@@ -166,7 +169,7 @@
 <td>
 <code><a href="reference/car_quality.html">car_quality()</a></code>, <code><a href="reference/car_quality.html">car_quality_summary()</a></code>
 </td>
-<td>Indicadores de qualidade: sobreposição e área fora do município</td>
+<td>Indicadores por imóvel e por município: sobreposição, área fora do município, áreas protegidas, embargos do Ibama e parcelas do Sigef</td>
 </tr>
 <tr>
 <td><code><a href="reference/car_tbl.html">car_tbl()</a></code></td>
@@ -186,9 +189,11 @@
 <ul>
 <li><a href="https://castlaboratory.github.io/carbr-r/articles/carbr.html">Primeiros passos</a></li>
 <li>
-<a href="https://castlaboratory.github.io/carbr-r/articles/inconsistencias.html">Inconsistências do cadastro</a>: sobreposições, imóveis fora do município, área declarada maior que o território.</li>
+<a href="https://castlaboratory.github.io/carbr-r/articles/inconsistencias.html">Inconsistências do cadastro</a>: sobreposições entre imóveis, terras indígenas e unidades de conservação, o confronto com o Sigef do Incra e a área declarada maior que o território.</li>
 <li>
-<a href="https://castlaboratory.github.io/carbr-r/articles/analise.html">Onde a análise está parada</a>: as etapas da análise por UF e quem aguarda resposta à notificação.</li>
+<a href="https://castlaboratory.github.io/carbr-r/articles/analise.html">Onde a análise está parada</a>: as etapas da análise por UF, quem aguarda resposta à notificação e a tipologia dos municípios.</li>
+<li>
+<a href="https://castlaboratory.github.io/carbr-r/articles/credito.html">Triagem para crédito e conformidade</a>: a conferência em lote dos impedimentos do crédito rural, com os mapas de embargos e de florestas públicas.</li>
 </ul>
 </div>
 <div class="section level2">
