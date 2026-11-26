@@ -48,7 +48,12 @@ e unidades de conservação vêm vazias se a publicação ainda não as traz.
   dentro de unidades de conservação de proteção integral e de uso
   sustentável (CNUC/MMA), com o nome e a categoria da principal em
   `conservation_unit` e `conservation_category` (a de proteção integral,
-  se houver).
+  se houver);
+
+- `embargo_count` e `embargo_share`: quantos embargos ambientais ativos
+  do Ibama alcançam o imóvel e que parcela da área está embargada (só os
+  termos que têm o polígono da área; os demais contam pelo ponto de
+  referência).
 
 `car_quality()` traz os indicadores por imóvel; `car_quality_summary()`,
 o resumo por município: imóveis não cancelados (`properties`), quantos
@@ -58,7 +63,9 @@ dois lados de cada par), e quantos imóveis (`outside_half`) e hectares
 (`outside_ha`) ficam fora do município declarado; e, para terras
 indígenas (`indigenous`), unidades de proteção integral
 (`strict_protection`) e de uso sustentável (`sustainable_use`), quantos
-imóveis têm mais de 1% da área dentro delas e quantos hectares (`*_ha`).
+imóveis têm mais de 1% da área dentro delas e quantos hectares (`*_ha`);
+e quantos imóveis têm embargo ativo do Ibama (`embargoed`) e os hectares
+embargados (`embargo_ha`).
 
 Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 declarado duas vezes e lote dentro de assentamento; a comparação é só

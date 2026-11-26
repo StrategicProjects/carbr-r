@@ -2,6 +2,13 @@
 
 ## carbr (development version)
 
+- [`car_check()`](https://castlaboratory.github.io/carbr-r/reference/car_check.md)
+  passa a apontar embargos ambientais ativos do Ibama (`embargo_count`,
+  `embargo_share`), que levam o resultado a `"attention"`;
+  [`car_quality()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+  e
+  [`car_quality_summary()`](https://castlaboratory.github.io/carbr-r/reference/car_quality.md)
+  trazem as colunas novas.
 - [`car_typology()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md)
   e
   [`car_typology_groups()`](https://castlaboratory.github.io/carbr-r/reference/car_typology.md):
