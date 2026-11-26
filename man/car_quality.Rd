@@ -49,8 +49,10 @@ referência);
 destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas, do
 Serviço Florestal;
 \item \code{sigef_count} e \code{sigef_share}: quantas parcelas georreferenciadas no
-Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem. Perto
-de 1 quer dizer que o perímetro declarado no CAR coincide com um
+Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem,
+contando só parcelas particulares e lotes de assentamento (glebas
+públicas e áreas protegidas, que também estão no Sigef, ficam de fora).
+Perto de 1 quer dizer que o perímetro declarado no CAR coincide com um
 georreferenciamento aprovado pelo Incra;
 \item \code{quilombola_share} e \code{settlement_share}: que parcela cai em parcelas do
 Sigef cuja natureza é território quilombola ou assentamento. \strong{A
