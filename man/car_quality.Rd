@@ -47,7 +47,16 @@ termos que têm o polígono da área; os demais contam pelo ponto de
 referência);
 \item \code{public_forest_share}: que parcela fica dentro de florestas públicas não
 destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas, do
-Serviço Florestal.
+Serviço Florestal;
+\item \code{sigef_count} e \code{sigef_share}: quantas parcelas georreferenciadas no
+Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem. Perto
+de 1 quer dizer que o perímetro declarado no CAR coincide com um
+georreferenciamento aprovado pelo Incra;
+\item \code{quilombola_share} e \code{settlement_share}: que parcela cai em parcelas do
+Sigef cuja natureza é território quilombola ou assentamento. \strong{A
+cobertura é parcial}: só os territórios já georreferenciados no Sigef;
+a camada completa de territórios quilombolas não está publicada pelo
+Incra hoje.
 }
 
 \code{car_quality()} traz os indicadores por imóvel; \code{car_quality_summary()},
@@ -61,7 +70,10 @@ indígenas (\code{indigenous}), unidades de proteção integral
 imóveis têm mais de 1\% da área dentro delas e quantos hectares (\verb{*_ha});
 quantos imóveis têm embargo ativo do Ibama (\code{embargoed}) e os hectares
 embargados (\code{embargo_ha}); e quantos têm mais de 1\% da área em floresta
-pública tipo B (\code{public_forest}, \code{public_forest_ha}).
+pública tipo B (\code{public_forest}, \code{public_forest_ha}). Do Sigef:
+\code{certified} (imóveis com mais da metade da área em parcelas
+georreferenciadas), \code{sigef_ha}, \code{quilombola} e \code{settlement} (imóveis com
+mais de 1\% em território quilombola ou em assentamento do Sigef).
 
 Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 declarado duas vezes e lote dentro de assentamento; a comparação é só

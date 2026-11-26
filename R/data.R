@@ -434,8 +434,9 @@ car_stage <- function(condition) {
 #' * `"ok"`: cadastro ativo, sem notificação pendente;
 #' * `"attention"`: cadastro pendente, analisado com notificação ainda sem
 #'   resposta do declarante, com mais de 1% da área sobre terra indígena,
-#'   unidade de conservação de proteção integral ou floresta pública não
-#'   destinada, ou com embargo ambiental ativo do Ibama;
+#'   unidade de conservação de proteção integral, floresta pública não
+#'   destinada ou território quilombola georreferenciado no Sigef, ou com
+#'   embargo ambiental ativo do Ibama;
 #' * `"blocked"`: cadastro cancelado ou suspenso;
 #' * `"not_found"`: código que não está na publicação (pode ter sido
 #'   cadastrado depois da última atualização);
@@ -449,9 +450,12 @@ car_stage <- function(condition) {
 #' cancelados e sem desembargo), localizados pelo polígono ou pelo ponto do
 #' termo; não entram embargos estaduais nem do ICMBio. As florestas públicas
 #' não destinadas ("tipo B") são as do Cadastro Nacional de Florestas
-#' Públicas. A verificação não cobre os demais impedimentos do crédito rural
-#' (territórios quilombolas, supressão de vegetação, trabalho análogo à
-#' escravidão) e não substitui a consulta oficial ao Sicar.
+#' Públicas. Os territórios quilombolas são só os já georreferenciados no
+#' Sigef, do Incra: a camada completa não está publicada hoje, então a
+#' ausência de alerta não garante que o imóvel esteja fora de um território
+#' quilombola. A verificação não cobre a supressão de vegetação nem o
+#' trabalho análogo à escravidão, e não substitui a consulta oficial ao
+#' Sicar.
 #'
 #' @param code Códigos de imóvel no CAR (`UF-0000000-identificador`).
 #' @returns Um tibble com uma linha por código, na ordem dada: `property_code`,
@@ -462,7 +466,8 @@ car_stage <- function(condition) {
 #'   para os imóveis não cancelados, `indigenous_share`,
 #'   `strict_protection_share`, `sustainable_use_share` (parcelas da área, de
 #'   0 a 1), `protected_area` (os nomes das áreas sobrepostas),
-#'   `embargo_count`, `embargo_share` e `public_forest_share`.
+#'   `embargo_count`, `embargo_share`, `public_forest_share`,
+#'   `quilombola_share` e `sigef_share`.
 #' @examplesIf interactive()
 #' car_check(c(
 #'   "PE-2611101-588BC484570D440484F527F07DF5AFFA",
@@ -553,7 +558,11 @@ car_check <- function(code) {
   extra <- paste0(extra, ifelse(forest >= 0.01, paste0(
     " Sobrep\u00f5e floresta p\u00fablica n\u00e3o destinada (tipo B) em ", car_percent(forest), "."
   ), ""))
-  alert <- (ti | strict | embargoes > 0 | forest >= 0.01) & out$check == "ok"
+  quilombola <- share(out$quilombola_share)
+  extra <- paste0(extra, ifelse(quilombola >= 0.01, paste0(
+    " Sobrep\u00f5e territ\u00f3rio quilombola georreferenciado no Sigef em ", car_percent(quilombola), "."
+  ), ""))
+  alert <- (ti | strict | embargoes > 0 | forest >= 0.01 | quilombola >= 0.01) & out$check == "ok"
   out$note <- trimws(paste0(ifelse(alert, "", out$note), extra))
   out$check[alert] <- "attention"
   out$protected_area <- mapply(function(a, b, c, d) {
@@ -563,7 +572,7 @@ car_check <- function(code) {
   out[c(
     "property_code", "check", "note", "stage", setdiff(columns, "property_code"),
     "indigenous_share", "strict_protection_share", "sustainable_use_share", "protected_area",
-    "embargo_count", "embargo_share", "public_forest_share"
+    "embargo_count", "embargo_share", "public_forest_share", "quilombola_share", "sigef_share"
   )]
 }
 
@@ -580,7 +589,7 @@ car_check_quality <- function(towns) {
   columns <- c(
     "property_code", "indigenous_share", "strict_protection_share", "sustainable_use_share",
     "indigenous_land", "conservation_unit", "conservation_category", "embargo_count", "embargo_share",
-    "public_forest_share"
+    "public_forest_share", "quilombola_share", "sigef_share"
   )
   out <- car_empty_quality()[columns]
   for (uf in unique(substr(names(towns), 1, 2))) {
@@ -599,7 +608,8 @@ car_empty_quality <- function() {
     overlap_count = integer(), overlap_share = double(), outside_share = double(),
     indigenous_share = double(), strict_protection_share = double(), sustainable_use_share = double(),
     indigenous_land = character(), conservation_unit = character(), conservation_category = character(),
-    embargo_count = integer(), embargo_share = double(), public_forest_share = double()
+    embargo_count = integer(), embargo_share = double(), public_forest_share = double(),
+    sigef_count = integer(), sigef_share = double(), quilombola_share = double(), settlement_share = double()
   )
 }
 
@@ -633,7 +643,16 @@ car_like <- function(out, empty) {
 #'   referência);
 #' * `public_forest_share`: que parcela fica dentro de florestas públicas não
 #'   destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas, do
-#'   Serviço Florestal.
+#'   Serviço Florestal;
+#' * `sigef_count` e `sigef_share`: quantas parcelas georreferenciadas no
+#'   Sigef (Incra) o imóvel alcança e que parcela da área elas cobrem. Perto
+#'   de 1 quer dizer que o perímetro declarado no CAR coincide com um
+#'   georreferenciamento aprovado pelo Incra;
+#' * `quilombola_share` e `settlement_share`: que parcela cai em parcelas do
+#'   Sigef cuja natureza é território quilombola ou assentamento. **A
+#'   cobertura é parcial**: só os territórios já georreferenciados no Sigef;
+#'   a camada completa de territórios quilombolas não está publicada pelo
+#'   Incra hoje.
 #'
 #' `car_quality()` traz os indicadores por imóvel; `car_quality_summary()`,
 #' o resumo por município: imóveis não cancelados (`properties`), quantos
@@ -646,7 +665,10 @@ car_like <- function(out, empty) {
 #' imóveis têm mais de 1% da área dentro delas e quantos hectares (`*_ha`);
 #' quantos imóveis têm embargo ativo do Ibama (`embargoed`) e os hectares
 #' embargados (`embargo_ha`); e quantos têm mais de 1% da área em floresta
-#' pública tipo B (`public_forest`, `public_forest_ha`).
+#' pública tipo B (`public_forest`, `public_forest_ha`). Do Sigef:
+#' `certified` (imóveis com mais da metade da área em parcelas
+#' georreferenciadas), `sigef_ha`, `quilombola` e `settlement` (imóveis com
+#' mais de 1% em território quilombola ou em assentamento do Sigef).
 #'
 #' Sobreposição entre imóveis não é sinônimo de disputa: inclui imóvel
 #' declarado duas vezes e lote dentro de assentamento; a comparação é só
@@ -710,7 +732,8 @@ car_quality_summary <- function(state = NULL) {
     strict_protection = integer(), strict_protection_ha = double(),
     sustainable_use = integer(), sustainable_use_ha = double(),
     embargoed = integer(), embargo_ha = double(),
-    public_forest = integer(), public_forest_ha = double()
+    public_forest = integer(), public_forest_ha = double(),
+    certified = integer(), sigef_ha = double(), quilombola = integer(), settlement = integer()
   )
   cat <- car_catalog_json()
   if (is.null(cat)) {

@@ -83,7 +83,12 @@ release_teste <- function(env = parent.frame()) {
     embargo_count = c(0L, 0L, 0L, 0L, 2L),
     embargo_share = c(0, 0, 0, 0, 0.4),
     # Property 3 (the one in the park) also has a quarter of its area on an undesignated public forest.
-    public_forest_share = c(0, 0, 0.25, 0, 0)
+    public_forest_share = c(0, 0, 0.25, 0, 0),
+    # Sigef: property 1 matches a certified parcel; the one in the APA falls on a quilombola territory.
+    sigef_count = c(1L, 0L, 0L, 1L, 0L),
+    sigef_share = c(0.98, 0, 0, 0.5, 0),
+    quilombola_share = c(0, 0, 0, 0.5, 0),
+    settlement_share = c(0, 0, 0, 0, 0)
   )
   duckdb::duckdb_register(con, "quality", quality)
   dir.create(file.path(dir, "quality"))
@@ -109,7 +114,11 @@ release_teste <- function(env = parent.frame()) {
             count(*) FILTER (embargo_count > 0) AS embargoed,
             sum(p.area_ha * embargo_share) AS embargo_ha,
             count(*) FILTER (public_forest_share > 0.01) AS public_forest,
-            sum(p.area_ha * public_forest_share) AS public_forest_ha
+            sum(p.area_ha * public_forest_share) AS public_forest_ha,
+            count(*) FILTER (sigef_share >= 0.5) AS certified,
+            sum(p.area_ha * sigef_share) AS sigef_ha,
+            count(*) FILTER (quilombola_share > 0.01) AS quilombola,
+            count(*) FILTER (settlement_share > 0.01) AS settlement
           FROM quality q JOIN props p USING (property_code) GROUP BY ALL) TO '%s' (FORMAT parquet)", f_qm
   ))
   dir.create(file.path(dir, "typology"))

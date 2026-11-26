@@ -175,7 +175,7 @@ test_that("car_check() classifies a batch of codes, one row per code, in the giv
     "property_code", "check", "note", "stage", "status", "condition", "property_type",
     "size_class", "area_ha", "fiscal_modules", "state", "municipality", "created_at",
     "indigenous_share", "strict_protection_share", "sustainable_use_share", "protected_area",
-    "embargo_count", "embargo_share", "public_forest_share"
+    "embargo_count", "embargo_share", "public_forest_share", "quilombola_share", "sigef_share"
   ))
   expect_equal(nrow(car_check(character())), 0)
 })
@@ -201,7 +201,7 @@ test_that("quality indicators come per property and per municipality", {
     "property_code", "municipality_code", "overlap_count", "overlap_share", "outside_share",
     "indigenous_share", "strict_protection_share", "sustainable_use_share",
     "indigenous_land", "conservation_unit", "conservation_category", "embargo_count", "embargo_share",
-    "public_forest_share"
+    "public_forest_share", "sigef_count", "sigef_share", "quilombola_share", "settlement_share"
   ))
   expect_equal(nrow(q), 5)
   town <- car_quality("PE", municipality = "petrolina")
@@ -222,6 +222,8 @@ test_that("quality indicators come per property and per municipality", {
   expect_equal(s$sustainable_use, c(1L, 0L))
   expect_equal(s$embargoed, c(0L, 1L))
   expect_equal(s$public_forest, c(1L, 0L))
+  expect_equal(s$certified, c(2L, 0L))
+  expect_equal(s$quilombola, c(1L, 0L))
   expect_equal(nrow(car_quality_summary()), 2)
 })
 
@@ -230,7 +232,10 @@ test_that("the check flags indigenous lands and strict protection units", {
   release_teste()
   code <- sprintf("PE-2611101-%032X", c(1, 2, 3, 6))
   out <- car_check(code)
-  expect_equal(out$check, c("ok", "attention", "attention", "ok"))
+  # The last one sits in an APA (which would not change the result) and on a quilombola territory (which does).
+  expect_equal(out$check, c("ok", "attention", "attention", "attention"))
+  expect_match(out$note[4], "quilombola georreferenciado no Sigef em 50% da", fixed = TRUE)
+  expect_equal(out$sigef_share[1], 0.98)
   expect_equal(out$indigenous_share, c(0, 0.8, 0, 0))
   expect_match(out$note[2], "(Terra Teste) em 80% da", fixed = TRUE)
   # A pending one keeps its own reason and gains the park.

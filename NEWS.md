@@ -4,6 +4,9 @@
   que levam o resultado a `"attention"`; `car_quality()` e `car_quality_summary()` trazem as colunas novas.
 * O mesmo para florestas públicas não destinadas ("tipo B"), pelo Cadastro Nacional de Florestas Públicas
   (`public_forest_share`).
+* Parcelas georreferenciadas do Sigef (Incra): `sigef_count` e `sigef_share` dizem quanto do imóvel coincide
+  com um georreferenciamento aprovado; `quilombola_share` e `settlement_share`, quanto cai em território
+  quilombola ou assentamento do Sigef. A triagem alerta para território quilombola, com cobertura parcial.
 * `car_typology()` e `car_typology_groups()`: tipologia dos municípios em cinco grupos, pelo perfil do
   cadastro (porte dos imóveis, etapa da análise e sobreposição).
 * `car_check()` passa a considerar a sobreposição com terras indígenas (Funai) e unidades de
